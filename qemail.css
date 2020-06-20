@@ -1,0 +1,18 @@
+body   { font-family: sans-serif;		}
+.count { font-size: 800%; font-weight: bold; vertical-align: middle; display: table-cell; }
+div.btn   {   vertical-align: middle; display: table-cell  }
+button.btn   { font-size: 175%; margin-left: 2ex; }
+.nock  { font-size: 180%; font-weight: bold }
+.usageExpand { margin-left: 5ex; top: -1ex; position: relative }
+#usageExpand { font-size: 200%;}
+.countParent { display: table; }
+
+/* Hide HTML5 Up and Down arrows, per https://www.thatstevensguy.com/programming/disable-arrows-on-number-inputs/ */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] { -moz-appearance: textfield;    }
+    
+
