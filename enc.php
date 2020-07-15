@@ -60,24 +60,24 @@ class enc_cookies {
     
     public static function getKey($cokey) {
 	if (isset($_COOKIE[$cokey])) return $_COOKIE[$cokey];
-	$cikey = base62();
+	$cikey = self::base62();
 	kwas(isset($cikey[40]), 'key not long enough');
 	setcookie($cokey, $cikey, time() + 365 * 86400);
 	return $cikey;
     }
-}
-
-function base62() {
     
-    $len = random_int(45, 50);
+    private static function base62() {
+    
+	$len = random_int(45, 50);
 
-    $basea = [ord('A'), ord('a'), ord('0')];
+	$basea = [ord('A'), ord('a'), ord('0')];
 
-    for ($i=0, $rs = ''; $i < $len; $i++)
-       for ($j=0, $ri = random_int(0, 61); $j < 62; $j++, $ri -= 26)
-	    if ($ri < 26) { $rs .= chr($basea[$j] + $ri); break; }
-	    
-    return $rs;
+	for ($i=0, $rs = ''; $i < $len; $i++)
+	   for ($j=0, $ri = random_int(0, 61); $j < 62; $j++, $ri -= 26)
+		if ($ri < 26) { $rs .= chr($basea[$j] + $ri); break; }
+
+	return $rs;
+    }
 }
 
 class enc_trans {
