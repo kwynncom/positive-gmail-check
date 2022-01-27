@@ -13,3 +13,5 @@ I never really intended for anyone else to use it on my server (see below).  On 
 it.  You're free to run your own copy.
 
 With that said, it is running at https://kwynn.com/t/7/12/email/  .  It will immediately take you to an OAUTH screen.
+******
+2022/01/27 02:16 - I just created a debugging branch.  The README file for that is useful.  I will remerge at least the README some time or another.
