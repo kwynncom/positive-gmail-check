@@ -14,11 +14,13 @@
 
 <script>
 
-window.onload = function() { post(); }
+window.onload = function() { 
+//	post(); 
+	}
 
 function setWin(status) {
-    if (status === 'up') window.onload = window.onfocus = window.onhashchange = post;
-    else  window.onload = window.onfocus = window.onhashchange = myNull;
+    /* if (status === 'up') window.onload = window.onfocus = window.onhashchange = post;
+    else  window.onload = window.onfocus = window.onhashchange = myNull; */
 }
 
 function myNull() {}
@@ -73,6 +75,7 @@ function doerr(emsg) {
     if (emsg) {
         byid('errmsg').innerHTML = emsg;
         byid('errparent').style.display = 'block';
+		setWin('down'); // otherwise infinite loop
     }
     else      byid('errparent').style.display = 'none';  
 }
@@ -125,7 +128,10 @@ function byid(id) { return document.getElementById(id); }
             </div>
             
         </div>
-
+<?php 
+	$ignore = 1;
+	unset($ignore);
+?>
 
     </body>
 </html>

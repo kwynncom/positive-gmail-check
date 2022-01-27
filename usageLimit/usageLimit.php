@@ -52,6 +52,7 @@ class usageLimit {
     public function getLimitsTxt() {
 	
 	$str = '';
+	if (!isset($this->cnt)) return 'no check history';
 	foreach ($this->cnt as $val) $str .= $val . ' ';
 	return $str;
     }

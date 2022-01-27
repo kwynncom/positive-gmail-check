@@ -33,6 +33,9 @@ class dao extends dao_plain {
     public function putToken($tok) { $this->modToken($tok, 'insert'); }
     
     private function modToken($ptok, $act) {
+		
+		if (!$ptok) return; // it will be null if the system has never been used or the db has been erased
+		
 	$ptok['access_token' ] = $this->enc->enc($ptok['access_token' ], 'atkey');
 	if (isset(
 	$ptok['refresh_token']))

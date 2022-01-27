@@ -26,24 +26,18 @@ class serverSwitch {
 	$mo = new mongoToFile(dao_plain::dbname, self::clientSecretName);
 	$fname = $mo->getFName();
 	
-	$kwsecdom = 'n/a';
-	if ($key === self::kwynnloc) $kwsecdom = self::getSecretDomain();
+	// $kwsecdom = 'n/a';
+	// if ($key === self::kwynnloc) $kwsecdom = self::getSecretDomain();
 
-	$settings = 
-	    array(
-		self::kwynnloc => array(
+	$set = 
+	    [
 		    'goopath'   => $fname,
-		    'oarurl'    => 'https://' . $kwsecdom . '/'
-		),
-
-		'kwynn.com' => array(
-		    'goopath'   => $fname,
-		    'oarurl'    => 'https://kwynn.com/t/7/12/email/'
-		)
-	    );
+		    'oarurl'    => 'https://' . $_SERVER['SERVER_NAME'] .   '/t/7/12/email/'
+		];
+	    
 	
-	kwas(isset($settings[$key]),  '1-535 ' . $key);
-	$set =     $settings[$key];
+//	kwas(isset($settings[$key]),  '1-535 ' . $key);
+//	$set =     $settings[$key];
 	kwas(file_exists($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30);
 	$this->settings = $set;
     }

@@ -7,13 +7,33 @@ require_once('serverSwitch.php'); // might need this
 require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
 
-if ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
 
+
+file_put_contents('/tmp/qe', 'gmc1 ' . date('r') . "\n" , FILE_APPEND);
+
+// if (isrv('kt')) 
+if (gmailClient::webCalledMe()) {
+file_put_contents('/tmp/qe', 'gmc3 ' . date('r') . "\n" , FILE_APPEND);
+	if ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
+	else {
+		$rh = apache_response_headers();
+		$a['emsg'] = 'should not be here without a code - gmailClient.php'; // conform with JavaScript
+		kwjae($a);
+	}
+}
 class gmailClient {
     
     private $refs = false;
     
+	public static function webCalledMe() {
+		$a = basename($_SERVER['PHP_SELF']);
+		$b = basename(__FILE__);
+		return $a === $b;
+	}
+	
     function __construct($code = false) {
+		
+		file_put_contents('/tmp/qe', 'gmc2 ' . date('r') . "\n" , FILE_APPEND);
 	
 	if (getTestMode()) {
 	    $this->testMode = true;

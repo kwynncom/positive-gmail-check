@@ -22,14 +22,17 @@ if (isset($exv)) {
     $pres  = $ulo->getPrev();
     
     $res->emsg = $emsg;
-    $res->msgtxt = $pres->msgtxt;
-    $res->dates =  $pres->dates;
-    // $res->pht  = $pht;
+	if ($pres) {
+		$res->msgtxt = $pres->msgtxt;
+		$res->dates =  $pres->dates;
+	} else {
+		$res->msgtxt = $res->dates = 'no history';
+	}
+
 } else $ulo->setPrev($res);
 
 $json = json_encode($res);
 
 echo $json;
 
-$x = 2;
-// $msgtxt is defined
+// $msgtxt is defined and I think needs to be defined

@@ -50,11 +50,12 @@ class GoogleClientWrapper {
     
     private function processAuthCode() {
 	if (!($code = $this->getOAuthCode())) return false;
-        $this->client->authenticate($code);
-        $accessToken = $this->client->getAccessToken();
+	$ar = $this->client->authenticate($code);
+	file_put_contents('/tmp/qe', 'gmc-0149 ' . json_encode($ar) . date('r') . "\n" , FILE_APPEND);
+	$accessToken = $this->client->getAccessToken();
 	$this->dao->putToken($accessToken);
 
-	header('Location: ' . $this->ssw->getBaseURL() /* . '?redirLocHeader=1' */);
+	// header('Location: ' . $this->ssw->getBaseURL() /* . '?redirLocHeader=1' */);
 	exit(0);
     }
     
