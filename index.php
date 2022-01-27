@@ -45,6 +45,8 @@ function post(pparam) {
 
 
 function process(rt, revoke) {
+	
+	inht('dates', '');
     
     if (!rt) return;
     
