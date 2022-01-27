@@ -12,6 +12,8 @@
 
 <link rel='stylesheet' type='text/css' href='qemail.css'>
 
+<script src='/opt/kwynn/js/utils.js'></script>
+
 <script>
 
 window.onload = function() { post(); }
@@ -52,7 +54,10 @@ function process(rt, revoke) {
     }
     else doerr(false);
     
-    try { var res = JSON.parse(rt); } catch(error) { return; }
+    try { var res = JSON.parse(rt); } catch(error) { 
+		doerr(rt);
+		return; 
+	}
     
     if (res.url) {
         setWin('down');
@@ -71,6 +76,7 @@ function process(rt, revoke) {
 
 function doerr(emsg) {
     if (emsg) {
+		setWin('down');
         byid('errmsg').innerHTML = emsg;
         byid('errparent').style.display = 'block';
     }

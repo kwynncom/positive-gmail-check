@@ -3,6 +3,8 @@
 require_once('usageLimit/usageLimit.php');
 require_once('gmailClient.php');
 
+$ulo = false;
+
 $msgtxt = 'Error';
 try { 
     $ulo = new usageLimit();
