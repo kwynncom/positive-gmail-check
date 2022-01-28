@@ -67,7 +67,12 @@ class dao_plain {
     
     public function deleteToken() {
         $this->tokc  ->deleteMany(array('sids' => array('$in' => [vsid()])), ['$unset' => ['gtok' => '']]); 
-	$this->sessc ->deleteMany(['sid'  => vsid()], ['$unset' => ['tgtok' => '']]); 
+		$this->sessc ->deleteMany(['sid'  => vsid()], ['$unset' => ['tgtok' => '']]); 
     }
+	
+	public static function deleteTokenStatic() {
+		$o = new self();
+		$o->deleteToken();
+	}
 
 }

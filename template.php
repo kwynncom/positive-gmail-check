@@ -57,26 +57,34 @@ class kwpemck {
 		
 		if (okin > 0) return true;
 		
-		const b = byid('redoBtn');
-		b.disabled = true;
-		setTimeout(function() { b.disabled = false; }, this.plimms);
+		this.setrbs(true);
+		const self = this;
+		setTimeout(function() { self.setrbs(true); }, this.plimms);
 			
 		this.lpo = now;
 		return false;
 	}
 	
+	setrbs(sin) {
+		const b = byid('redoBtn');
+		b.disabled = !sin;		
+	}
+	
+	getrbs() { return !(byid('redoBtn').disabled); }
+	
 	pemckpost(pparam) {
-		
-		if (this.overLim()) return;
 
 		const revoke = pparam === 'revoke' ? '?revoke=Y' : '';
 
-		inht('msgtxt', '?');
-		inht('dates', '');
-
+		if (!revoke) {
+			if (!this.getrbs()) return;
+			if (this.overLim()) return;
+			inht('msgtxt', '?');
+			inht('dates', '');
+		}
+		if (revoke) this.setWin('down');
 		var req = new XMLHttpRequest();
 		req.open('GET', this.serverURL + (revoke));
-		if (revoke) this.setWin('down');
 		req.send();
 
 		const self = this;
@@ -129,13 +137,15 @@ class kwpemck {
 	}
 
 	 confirmRevoke() {
+		this.setrbs(false);
 		byid('confirmRevokeDiv').style.display = 'block';
 		byid('revokeBtn1').style.display = 'none';
 	}
 
 	 noRevoke() {
-		  byid('confirmRevokeDiv').style.display = 'none';  
-		  byid('revokeBtn1').style.display = 'block';
+		this.setrbs(true);
+		byid('confirmRevokeDiv').style.display = 'none';  
+		byid('revokeBtn1').style.display = 'block';
 	}
 }
 
@@ -165,7 +175,7 @@ class kwpemck {
 		<div style='display: none; ' id='confirmRevokeDiv'>    
 			<div><label>Revoke Access - You Sure?</label></div>
 			<div style='margin-top: 2ex'>
-				<button id='revokeBtnN'  onclick='noRevoke()' style='display: block; margin-bottom: 9ex'>No</button>
+				<button id='revokeBtnN'  onclick='KWPGO.noRevoke();' style='display: block; margin-bottom: 9ex'>No</button>
 				<button id='revokeBtnY'  onclick='KWPGO.pemckpost("revoke");' style='display: block'>Yes</button>
 			</div>
 		</div>
