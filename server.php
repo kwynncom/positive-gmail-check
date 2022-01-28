@@ -21,9 +21,12 @@ class pemsDoit {
 			$ulo->putUse($gdo->check()); // *** get text / pre value of check, then check limit then check email
 			$msgtxt = $gdo->getText();
 			$ulo->setEmail($gdo->getEmail());
+			
+			// if (time() < strtotime('2022-01-27 23:38')) kwas(false, 'test ex');
+			
 		} catch (Exception $exv) { }
 
-		if (isset($gdo)) $oaurl = $gdo->getOAuthURL();
+		if (isset($gdo)) $url = $gdo->getOAuthURL();
 	
 		unset($gdo);
 
@@ -39,7 +42,7 @@ class pemsDoit {
 	
 	function doerr($vsin) {
 		if (!isset($vsin['exv']))  return;
-		extract($vsin);
+		extract($vsin); unset($vsin);
 		$emsg = $exv->getMessage();
 		$pres = $ulo->getPrev();
 		$vs20 = get_defined_vars();
