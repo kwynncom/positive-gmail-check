@@ -6,6 +6,7 @@ require_once('testMode.php');
 require_once('serverSwitch.php');
 require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
+require_once('isUserCookie.php');
 
 if   ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
 unset($code);
@@ -15,7 +16,9 @@ class gmailClient {
     private $refs = false;
     
     function __construct($code = false) {
-	
+
+	isucookie::set();
+		
 	if (getTestMode()) {
 	    $this->testMode = true;
 	    return;
@@ -70,6 +73,11 @@ class gmailClient {
 	else return 'nock';
     }
     
+	public function forceGetOAuthURL() {
+	 if (!isset($this->client)) return false;		
+		return $this->client->forceGetOAuthURL();
+	}
+	
     public function getOAuthURL() {
 	 if (!isset($this->client)) return false;
 	 header('Access-Control-Allow-Origin:  https://accounts.google.com');

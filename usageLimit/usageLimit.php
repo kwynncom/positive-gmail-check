@@ -52,7 +52,8 @@ class usageLimit {
     public function getLimitsTxt() {
 	
 	$str = '';
-	foreach ($this->cnt as $val) $str .= $val . ' ';
+	if (	isset($this->cnt))
+		foreach  ($this->cnt as $val) $str .= $val . ' ';
 	return $str;
     }
     

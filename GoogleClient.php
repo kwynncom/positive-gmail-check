@@ -65,10 +65,16 @@ class GoogleClientWrapper {
 	$auth_url = $this->client->createAuthUrl();
 	$this->oauthurl = $auth_url;
     }
-    
+  
+	public function forceGetOAuthURL() {
+		return $this->client->createAuthUrl();	
+		
+	}
+	
     public function getOAuthURL() {
 	if (isset  ($this->oauthurl)) 
 	     return $this->oauthurl;
 	else return false;
     }
+
 }

@@ -12,7 +12,7 @@ class isucookie {
 		
 	}
 	static function unset() { 
-		setcookie(self::cnm, false, time() + 20); 
+		setcookie(self::cnm, false, time() - 100000); 
 		
 	}
 	static function is()  {	return kwifs($_COOKIE, self::cnm);	}

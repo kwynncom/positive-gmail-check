@@ -13,13 +13,19 @@ class pemsDoit {
 
 		$ulo = false;
 		$msgtxt = 'Error';
+		// $revoke = false;
 		try { 
 			$ulo = new usageLimit();
 			$gdo = new gmailClient();
 			if (doRevoke()) {
-				$gdo->revokeToken();
-				dao_plain::deleteTokenStatic();
 				isucookie::unset();
+				// $revoke = true;
+				$url = $gdo->forceGetOAuthURL(); 
+				if (time() > strtotime('2022-01-27 02:30')) {
+						$gdo->revokeToken();
+					dao_plain::deleteTokenStatic();
+					kwas(false, 'revoking');
+				}
 			}
 			$ulo->putUse($gdo->check()); // *** get text / pre value of check, then check limit then check email
 			$msgtxt = $gdo->getText();
@@ -27,7 +33,13 @@ class pemsDoit {
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-		if (isset($gdo)) $url = $gdo->getOAuthURL(); unset($gdo);
+		if (!isset($url) && isset($gdo)) {
+			$url = $gdo->getOAuthURL(); 
+			/* if ($oau) {
+				$url = serverSwitch::getThisAPath() . '?revoked=Y';
+			} unset($oau); */
+		}
+		unset($gdo);
 		
 		$now   = time();
 		$dates = date('g:i A', $now) . ' (' . date('s', $now) . 's) ' . date('l, F j, Y', $now); unset($now);
@@ -42,6 +54,8 @@ class pemsDoit {
 		extract($vsin); unset($vsin, $dates, $glt, $msgtxt);
 		$emsg = $exv->getMessage();
 		$pres = $ulo->getPrev();
+		unset($pres['url']);
+				
 		extract($pres); unset($pres);
 		$vs20 = get_defined_vars();
 		$this->cleanseV($vs20);
@@ -49,14 +63,14 @@ class pemsDoit {
 	}
 	
 	function dook10($vsin) {
-		isucookie::set();
 		extract($vsin);
+		// if (!$revoke) isucookie::set();
 		$this->cleanseV($vsin);
 		$ulo->setPrev($vsin);
 		kwjae($vsin);		
 	}
 	
-	function cleanseV(&$rin) { unset($rin['ulo'], $rin['exv']); }
+	function cleanseV(&$rin) { unset($rin['ulo'], $rin['exv'], $rin['revoke']); }
 }
 
 new pemsDoit();

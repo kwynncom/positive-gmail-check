@@ -11,6 +11,13 @@ class serverSwitch {
     const redExt = 'gmailClient.php';
     
     const kwynnloc = 'kwynnLocal';
+	
+	const thisupath = '/t/7/12/email/';
+	const thisapath = self::thisupath . 'intro.php';
+	
+	public static function getThisAPath() {
+		return 'https://' . $_SERVER['SERVER_NAME'] .  self::thisapath;
+	}
     
     private static function getSecretDomain() {     
 	$co = new kwynn_creds();
@@ -38,7 +45,7 @@ class serverSwitch {
 
 		// 'kwynn.com' => array(
 		    'goopath'   => $fname,
- 		    'oarurl'    => 'https://' . $_SERVER['SERVER_NAME'] .   '/t/7/12/email/'
+ 		    'oarurl'    => 'https://' . $_SERVER['SERVER_NAME'] .  self::thisupath
 		// )
 	    );
 	
