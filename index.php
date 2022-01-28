@@ -14,13 +14,25 @@
 
 <script src='/opt/kwynn/js/utils.js'></script>
 
-<script>
+<script> // 19:08
 
-window.onload = function() { post(); }
+window.addEventListener('DOMContentLoaded', () => {  post(); });
 
 function setWin(status) {
-    if (status === 'up') window.onload = window.onfocus = window.onhashchange = post;
-    else  window.onload = window.onfocus = window.onhashchange = myNull;
+	
+	const evs = ['DOMContentLoaded', 'focus', 'hashchange'];
+	let func = myNull;
+	
+    if (status === 'up') func = post;
+		
+	for (let i=0; i < evs.length; i++) window.addEventListener(evs[i], () => {  func(); });
+//		window.addEventListener('focus', () => {  post(); });
+//		window.addEventListener('hashchange', () => {  post(); });
+
+		//	window.onload = window.onfocus = window.onhashchange = post;
+		
+	// }
+    // else  window.onload = window.onfocus = window.onhashchange = myNull;
 }
 
 function myNull() {}
@@ -102,8 +114,6 @@ function noRevoke() {
       byid('confirmRevokeDiv').style.display = 'none';  
       byid('revokeBtn1').style.display = 'block';
 }
-
-function byid(id) { return document.getElementById(id); }
 
 </script>
 </head>
