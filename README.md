@@ -16,7 +16,20 @@ it.  You're also free to run your own copy.
 
 With that said, it is running at https://kwynn.com/t/7/12/email/  .  It will immediately take you to an OAUTH screen.
 ******
+RUNNING STUFF - A DEVELOPMENT (NOT LIVE) ISSUE
 
+The following only happens in development, because the live version has been very, very reliable.  The probably may be a conflict between live and 
+dev.  I suspect I am not handling an error properly.
+
+There is a situation in which the system breaks and the solution is to delete the OAUTH tokens, probably both in sessions and the gootokens 
+(or whatever I called it) table / collection.  Specifically, I think a $code keeps going through ahd through repeatedly--the redirect gets 
+called repeatedly--but the system still won't auth.
+
+Ideally I would track this down; we'll see.
+
+It looks like I only keep auth data in the go / goo collection when there is a refresh token; otherwise I keep it only in the sessions 
+collection.  In this case I mean the final auth data--access tokens and refresh tokens.
+*****
 INSTALLATION STUFF
 
 **

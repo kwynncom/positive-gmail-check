@@ -157,7 +157,7 @@ class kwpemck {
 </head>
 <body>
 	
-	<div>version ck 02:41</div>
+	<!-- <div>version ck 02:43</div> -->
 	
 	<div id='errparent' style='display: none'>
 		<p id='errmsg'></p>
