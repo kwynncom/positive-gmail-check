@@ -57,7 +57,7 @@ class kwpemck {
 		
 		if (okin > 0) return true;
 		
-		this.setrbs(true);
+		this.setrbs(false);
 		const self = this;
 		setTimeout(function() { self.setrbs(true); }, this.plimms);
 			
