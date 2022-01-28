@@ -1,13 +1,14 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
-require_once('dao.php'); // needs its own require because it's being called directly
+require_once('dao.php');
 require_once('testMode.php');
-require_once('serverSwitch.php'); // might need this
+require_once('serverSwitch.php');
 require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
 
-if ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
+if   ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
+unset($code);
 
 class gmailClient {
     

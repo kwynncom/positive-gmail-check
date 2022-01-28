@@ -11,8 +11,8 @@ for hours.
 To this day (mid 2020 and Android 8.x), when a pull or push will show new emails is iffy, although the situation is much improved.   I've used this several 
 to many times a day for 2.5 years (end of 2017 to mid 2020).  It works very near perfectly.  
 
-I never really intended for anyone else to use it on my server (see below).  On one hand, you're welcome to.  On the other hand, I make no guarantees about 
-it.  You're free to run your own copy.
+I never really intended for anyone else to use it on my server.  On one hand, you're welcome to.  On the other hand, I make no guarantees about 
+it.  You're also free to run your own copy.
 
 With that said, it is running at https://kwynn.com/t/7/12/email/  .  It will immediately take you to an OAUTH screen.
 ******

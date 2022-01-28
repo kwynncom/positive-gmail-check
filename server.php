@@ -1,35 +1,64 @@
 <?php
+require_once('usageLimit/usageLimit.php');
+require_once('gmailClient.php');
 
-require_once('main.php');
+class pemsDoit {
 
-$res = new stdClass();
+	function __construct() {
+		$this->do10();
+	}
+	
+	function do10() {
 
-if (isset($gdo) && ($oaurl = $gdo->getOAuthURL())) $res->url = $oaurl;
+		$ulo = false;
+		$msgtxt = 'Error';
+		try { 
+			$ulo = new usageLimit();
+			$gdo = new gmailClient();
 
-$res->msgtxt = $msgtxt;
+			if (doRevoke()) $gdo->revokeToken();
 
-$dates  = date('g:i A ');
-$dates .= '(' . date('s') . 's) ' . date('l, F j, Y');
+			$ulo->putUse($gdo->check()); // *** get text / pre value of check, then check limit then check email
+			$msgtxt = $gdo->getText();
+			$ulo->setEmail($gdo->getEmail());
+		} catch (Exception $exv) { }
 
-$res->dates = $dates;
+		if (isset($gdo)) $oaurl = $gdo->getOAuthURL();
+	
+		unset($gdo);
 
-$glt = $ulo->getLimitsTxt();
+		$dates  = date('g:i A ');
+		$dates .= '(' . date('s') . 's) ' . date('l, F j, Y');
 
-$res->glt = $glt;
+		$glt = $ulo->getLimitsTxt();
 
-if (isset($exv)) {
-    $emsg = $exv->getMessage();
-    $pres  = $ulo->getPrev();
-    
-    $res->emsg = $emsg;
-    $res->msgtxt = $pres->msgtxt;
-    $res->dates =  $pres->dates;
-    // $res->pht  = $pht;
-} else $ulo->setPrev($res);
-
-$json = json_encode($res);
-
-echo $json;
-
-$x = 2;
-// $msgtxt is defined
+		$dvs = get_defined_vars();
+		$this->doerr ($dvs);
+		$this->dook10($dvs);
+	}
+	
+	function doerr($vsin) {
+		if (!isset($vsin['exv']))  return;
+		extract($vsin);
+		$emsg = $exv->getMessage();
+		$pres = $ulo->getPrev();
+		$vs20 = get_defined_vars();
+		$this->cleanseV($vs20);
+		kwjae($vs20);
+		
+	}
+	
+	function cleanseV(&$rin) {
+		unset($rin['ulo']);
+		unset($rin['res']);		
+		unset($rin['exv']);
+	}
+	
+	function dook10($vsin) {
+		extract($vsin);
+		$this->cleanseV($vsin);
+		$ulo->setPrev($vsin);
+		kwjae($vsin);		
+	}
+}
+new pemsDoit();
