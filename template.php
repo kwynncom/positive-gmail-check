@@ -10,7 +10,7 @@
 
 <script src='/opt/kwynn/js/utils.js'></script>
 
-<script> // 2022/01/28 02:14
+<script>
 
 var KWPGO = false;
 
@@ -45,24 +45,28 @@ class kwpemck {
 	}
 	
 	overLim() {
-		
+
+		this.settobtn();
+
 		const now = time();
 		
 		if (!this.lpo) {
 			this.lpo = now;
 			return;
 		}
-		
+
 		const okin = this.plimms - (now - this.lpo);
 		
 		if (okin > 0) return true;
-		
-		this.setrbs(false);
-		const self = this;
-		setTimeout(function() { self.setrbs(true); }, this.plimms);
 			
 		this.lpo = now;
 		return false;
+	}
+	
+	settobtn() {
+		this.setrbs(false);
+		const self = this;
+		setTimeout(function() { self.setrbs(true); }, this.plimms);		
 	}
 	
 	setrbs(sin) {
@@ -152,6 +156,9 @@ class kwpemck {
 </script>
 </head>
 <body>
+	
+	<div>version ck 02:41</div>
+	
 	<div id='errparent' style='display: none'>
 		<p id='errmsg'></p>
 		<p>Previous result below</p>

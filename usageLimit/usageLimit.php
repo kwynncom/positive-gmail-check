@@ -14,7 +14,7 @@ class usageLimit {
 
 	startSSLSession(1);
 	
-	$lim[] = ['type' => 'checked', 'limits' => [86400 => 100, 3600 => 30, 60 => 8, 5 => 1]];
+	$lim[] = ['type' => 'checked', 'limits' => [86400 => 175, 3600 => 30, 60 => 8, 5 => 1]];
 	$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
 	$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
 	
@@ -68,11 +68,15 @@ class usageLimit {
     }
     
     public function setPrev($res) {
-	$_SESSION['prevRes'] = $res;
+		if (is_array($res)) $setto = $res;
+		else				$setto = [];
+			
+		$_SESSION['prevRes'] = $setto;
+	
     }
     
     public function getPrev() {
-	return isset($_SESSION['prevRes']) ? $_SESSION['prevRes'] : '';
+		return isset($_SESSION['prevRes']) ? $_SESSION['prevRes'] : [];
     }
     
     

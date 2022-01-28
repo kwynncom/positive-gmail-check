@@ -55,7 +55,7 @@ class pemsDoit {
 	}
 	
 	function dook10($vsin) {
-		isucookie::set();
+		if (!kwifs($vsin, 'url')) isucookie::set();
 		extract($vsin);
 		$this->cleanseV($vsin);
 		$ulo->setPrev($vsin);
