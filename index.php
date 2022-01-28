@@ -14,36 +14,124 @@
 
 <script src='/opt/kwynn/js/utils.js'></script>
 
-<script> // 19:08
+<script> // 19:40
 
-window.addEventListener('DOMContentLoaded', () => {  post(); });
+class kwpemck {
+	
+	static getServerURL() { return 'server.php'; }
+	constructor() {
+		kwpemck.pemckpost();
+		kwpemck.setWin('up');
+	}
+	
+	static setWin(status) {
+	
+		const evs = ['DOMContentLoaded', 'focus', 'hashchange'];
+
+		for (let i=0; i < evs.length; i++) 
+			if (status === 'up') window.addEventListener   (evs[i], kwpemck.pemckpost); // MDN says not added a second time if already
+			else				 window.removeEventListener(evs[i], kwpemck.pemckpost);
+	}
+	
+	static pemckpost(pparam) {
+
+		const revoke = pparam === 'revoke' ? '?revoke=Y' : '';
+
+		inht('msgtxt', '?');
+		inht('dates', '');
+
+		var req = new XMLHttpRequest();
+		req.open('GET', kwpemck.getServerURL() + (revoke));
+		if (revoke) kwpemck.setWin('down');
+		req.send();
+
+		req.onload    = function() {  
+			kwpemck.process(this.responseText, revoke); 
+		}
+	}
+	
+	static process(rt, revoke) {
+
+		// inht('dates', '');
+
+		if (!rt) return;
+
+		if (rt.length > 500) {
+			kwpemck.doerr(rt);
+			return;
+		}
+		else kwpemck.doerr(false);
+
+		try { var res = JSON.parse(rt); } catch(error) { 
+			kwpemck.doerr(rt);
+			return; 
+		}
+
+		if (res.url) {
+			kwpemck.setWin('down');
+			window.location = res.url;
+			return;
+		}
+
+		if (!revoke) kwpemck.setWin('up');
+
+		inht('msgtxt', res.msgtxt);
+		inht('usage' , res.glt);
+		inht('dates' , res.dates);
+
+		kwpemck.doerr(res.emsg);
+	 }
+
+	static doerr(emsg) {
+		if (emsg) {
+			setWin('down');
+			inht('errmsg', emsg);
+			byid('errparent').style.display = 'block';
+		}
+		else      byid('errparent').style.display = 'none';  
+	}	
+
+	static usageExpandF() {
+		byid('usage'      ).style.visibility = 'visible';
+		byid('usageExpand').style.visibility = 'hidden';
+		byid('revokeBtn1' ).style.display = 'block';
+	}
+
+	static confirmRevoke() {
+		byid('confirmRevokeDiv').style.display = 'block';
+		byid('revokeBtn1').style.display = 'none';
+	}
+
+	static noRevoke() {
+		  byid('confirmRevokeDiv').style.display = 'none';  
+		  byid('revokeBtn1').style.display = 'block';
+	}
+	
+}
+
+window.addEventListener('DOMContentLoaded', function() { new kwpemck(); });
+
+/*
+
+var SERVER_FILE_G_CONST = 'server.php';
+
+setWin('up');
 
 function setWin(status) {
 	
 	const evs = ['DOMContentLoaded', 'focus', 'hashchange'];
-	let func = myNull;
 	
-    if (status === 'up') func = post;
-		
-	for (let i=0; i < evs.length; i++) window.addEventListener(evs[i], () => {  func(); });
-//		window.addEventListener('focus', () => {  post(); });
-//		window.addEventListener('hashchange', () => {  post(); });
-
-		//	window.onload = window.onfocus = window.onhashchange = post;
-		
-	// }
-    // else  window.onload = window.onfocus = window.onhashchange = myNull;
+	for (let i=0; i < evs.length; i++) 
+		if (status === 'up') window.addEventListener   (evs[i], post); // MDN says not added a second time if already
+		else				 window.removeEventListener(evs[i], post);
 }
-
-function myNull() {}
-
-var SERVER_FILE_G_CONST = 'server.php';
 
 function post(pparam) {
     
     const revoke = pparam === 'revoke' ? '?revoke=Y' : '';
     
-    byid('msgtxt').innerHTML = '?';
+    inht('msgtxt', '?');
+	inht('dates', '');
     
     var req = new XMLHttpRequest();
     req.open('GET', SERVER_FILE_G_CONST + (revoke));
@@ -81,9 +169,9 @@ function process(rt, revoke) {
     
     if (!revoke) setWin('up');
     
-    byid('msgtxt').innerHTML = res.msgtxt;
-    byid('usage' ).innerHTML = res.glt;
-    byid('dates' ).innerHTML = res.dates;
+    inht('msgtxt', res.msgtxt);
+    inht('usage' , res.glt);
+    inht('dates' , res.dates);
     
     doerr(res.emsg);
  }
@@ -91,7 +179,7 @@ function process(rt, revoke) {
 function doerr(emsg) {
     if (emsg) {
 		setWin('down');
-        byid('errmsg').innerHTML = emsg;
+        inht('errmsg', emsg);
         byid('errparent').style.display = 'block';
     }
     else      byid('errparent').style.display = 'none';  
@@ -106,7 +194,6 @@ function usageExpandF() {
 
 function confirmRevoke() {
     byid('confirmRevokeDiv').style.display = 'block';
-    // byid('revokeBtn1').style.visibility = 'hidden';
     byid('revokeBtn1').style.display = 'none';
 }
 
@@ -114,7 +201,7 @@ function noRevoke() {
       byid('confirmRevokeDiv').style.display = 'none';  
       byid('revokeBtn1').style.display = 'block';
 }
-
+*/
 </script>
 </head>
     <body>
@@ -126,20 +213,20 @@ function noRevoke() {
         		
 	<div class='countParent'>
 	    <span class='count' id='msgtxt'>?</span>
-	    <div class='btn'><button  class='btn' onclick='post()' >redo</button></div>
+	    <div class='btn'><button  class='btn' onclick='kwpemck.pemckpost();' >redo</button></div>
 	</div>
 
         <p id='dates'></p>
         
-        <p class='usageExpand'><span id='usageExpand' onclick='usageExpandF()'>+</span>
+        <p class='usageExpand'><span id='usageExpand' onclick='kwpemck.usageExpandF();'>+</span>
             <span id='usage' style='visibility: hidden'></span>
         </p>
-        <button id='revokeBtn1' style='display: none; margin-top: 4ex' onclick='confirmRevoke()'>revoke access</button>
+        <button id='revokeBtn1' style='display: none; margin-top: 4ex' onclick='kwpemck.confirmRevoke();'>revoke access</button>
         <div style='display: none; ' id='confirmRevokeDiv'>    
             <div><label>Revoke Access - You Sure?</label></div>
             <div style='margin-top: 2ex'>
         <button id='revokeBtnN'  onclick='noRevoke()' style='display: block; margin-bottom: 9ex'>No</button>
-                    <button id='revokeBtnY'  onclick='post("revoke")' style='display: block'>Yes</button>
+                    <button id='revokeBtnY'  onclick='kwpemck.pemckpost("revoke");' style='display: block'>Yes</button>
             </div>
             
         </div>
