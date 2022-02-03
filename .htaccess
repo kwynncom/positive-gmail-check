@@ -1,0 +1,4 @@
+# Google OAUTH
+RewriteEngine On
+RewriteCond %{QUERY_STRING} !^.*XDEBUG.*$
+RewriteRule   receiveAuthCode.php(.*)$  https://%{HTTP_HOST}/t/7/12/email/receiveAuthCode.php?XDEBUG_SESSION_START=netbeans-xdebug&%{QUERY_STRING} [L,NE]

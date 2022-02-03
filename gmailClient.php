@@ -8,8 +8,7 @@ require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
 require_once('isUserCookie.php');
 
-if   ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code);
-unset($code);
+// if   ($code = GoogleClientWrapper::getOAuthCode()) new gmailClient($code); unset($code);
 
 class gmailClient {
     

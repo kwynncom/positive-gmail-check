@@ -6,17 +6,17 @@ class dao_mongoToFile extends dao_generic {
     
     const collName = 'kwtom_files';
     
-    public function __construct($dbname) {
-	parent::__construct($dbname);
-	$this->fcoll = $this->client->selectCollection($dbname, self::collName);
-	// if (time() < strtotime('2019-10-19 22:00') && isKwDev()) $this->fcoll->deleteMany([]);
-	
+    public function __construct($dbname, $cbf) {
+		parent::__construct($dbname);
+		$this->fcoll = $this->client->selectCollection($dbname, self::collName);
+		$this->cbf = $cbf;
     }
    
     public function get($newname) {
-	$res = $this->fcoll->findOne(['name' => $newname]);
-	if ($res) return json_encode($res['file']);
-	return $res;
+		$resr = $this->fcoll->findOne(['name' => $newname]);
+		$tf = $this->cbf;
+		$res = $tf($resr);
+		return json_encode($res['file']);
     }
     
     public function put($newname, $datin) {
@@ -44,8 +44,8 @@ class mongoToFile  {
     const pbase = '/tmp/';
     const lfilebase = self::pbase . 'cpcs_mongoToFile_lock';
     
-    public function __construct($dbname, $newname, $origPath = false) {
-	$this->dao = new dao_mongoToFile($dbname);
+    public function __construct($dbname, $newname, $origPath = false, $cbf = false) {
+	$this->dao = new dao_mongoToFile($dbname, $cbf);
 	
 	$lfn = self::lfilebase . '_' . get_current_user();
 	

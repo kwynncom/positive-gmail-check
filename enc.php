@@ -1,5 +1,7 @@
 <?php
 
+require_once('dao.php');
+
 function vsid() { return hash('sha256', ptvsid()); }
 
 class dao extends dao_plain {

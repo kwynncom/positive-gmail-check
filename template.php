@@ -99,11 +99,13 @@ class kwpemck {
 
 		if (!rt) return;
 
-		if (rt.length > 500) {
+	/*	if (rt.length > 500) {
 			this.doerr(rt);
 			return;
 		}
-		else this.doerr(false);
+		else  */
+			
+		this.doerr(false);
 
 		try { var res = JSON.parse(rt); } catch(error) { 
 			this.doerr(rt);
@@ -112,7 +114,7 @@ class kwpemck {
 
 		if (res.url) {
 			this.setWin('down');
-			window.location = res.url;
+			window.location = res.url; // + '&XDEBUG_SESSION_START=netbeans-xdebug';
 			return;
 		}
 

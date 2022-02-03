@@ -1,8 +1,15 @@
 <?php
 
+require_once('serverSwitch.php');
+require_once('dao.php');
+
 class GoogleClientWrapper {
     
-    function __construct() {
+	public static function fromRedirectURL() {
+		new self(true);
+	}
+	
+    function __construct($fromRU = false) {
 	
 	$this->ssw = new serverSwitch();
 	$path = $this->ssw->getPath();
@@ -13,7 +20,10 @@ class GoogleClientWrapper {
 	$client->setIncludeGrantedScopes(true);
 	$this->client = $client;
 	
-	$this->dao = new dao();
+	if ($fromRU) $this->processAuthCode();
+	
+	if (!isset($this->dao)) 
+		$this->dao = new dao();
     }
     
     public function addScope($scope) { $this->client->addScope($scope);  }
@@ -50,8 +60,10 @@ class GoogleClientWrapper {
     
     private function processAuthCode() {
 	if (!($code = $this->getOAuthCode())) return false;
-        $this->client->authenticate($code);
+        $res = $this->client->authenticate($code);
+		if (kwifs($res, 'error')) kwas(false, json_encode($res));
         $accessToken = $this->client->getAccessToken();
+		if (!isset($this->dao)) $this->dao = new dao();
 	$this->dao->putToken($accessToken);
 
 	header('Location: ' . $this->ssw->getBaseURL() /* . '?redirLocHeader=1' */);
