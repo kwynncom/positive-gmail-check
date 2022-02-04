@@ -11,19 +11,18 @@ class GoogleClientWrapper {
 	
     function __construct($fromRU = false) {
 	
-	$this->ssw = new serverSwitch();
-	$path = $this->ssw->getPath();
+		$this->ssw = new serverSwitch();
+		$path = $this->ssw->getPath();
+
+		$client = new Google_Client();
+		$client->setAuthConfig($path);
+		$client->setAccessType('offline');
+		$client->setIncludeGrantedScopes(true);
+		$this->client = $client;
+
+		if ($fromRU) $this->processAuthCode();
 	
-	$client = new Google_Client();
-	$client->setAuthConfig($path);
-	$client->setAccessType('offline');
-	$client->setIncludeGrantedScopes(true);
-	$this->client = $client;
-	
-	if ($fromRU) $this->processAuthCode();
-	
-	if (!isset($this->dao)) 
-		$this->dao = new dao();
+		$this->setDao();
     }
     
     public function addScope($scope) { $this->client->addScope($scope);  }
@@ -31,22 +30,21 @@ class GoogleClientWrapper {
     public function getGoogleClient() { return $this->client; }
     
     public function revokeToken() {
-	$res = $this->client->revokeToken(); // returns boolean true on success
-	$x = 5;
+		$res = $this->client->revokeToken(); // returns boolean true on success
     }
     
     public function setToken() {
 	$accessToken = $this->dao->getToken();
 	if (!$accessToken) return $this->doOAuth();
 	else {
-	    $this->client->setAccessToken($accessToken);
-	    if ($this->client->isAccessTokenExpired()) {
-		try {
-		    $creds = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-		} catch(Exception $e) {
-		    return $this->doOAuth();
-		}
-		if (isset($creds['error'])) return $this->doOAuth();
+			$this->client->setAccessToken($accessToken);
+			if ($this->client->isAccessTokenExpired()) {
+			try {
+				$creds = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+			} catch(Exception $e) {
+				return $this->doOAuth();
+			}
+			if (isset($creds['error'])) return $this->doOAuth();
 	    }
 	}
 	
@@ -58,13 +56,20 @@ class GoogleClientWrapper {
 	return     $_REQUEST['code'];
     }
     
+	private function setDao() {
+		if (!isset($this->dao)) $this->dao = new dao();		
+	}
+	
     private function processAuthCode() {
 	if (!($code = $this->getOAuthCode())) return false;
         $res = $this->client->authenticate($code);
+		$this->setDao();
+		$this->dao->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
         $accessToken = $this->client->getAccessToken();
-		if (!isset($this->dao)) $this->dao = new dao();
-	$this->dao->putToken($accessToken);
+		$this->setDao();
+		
+		$this->dao->putToken($accessToken);
 
 	header('Location: ' . $this->ssw->getBaseURL() /* . '?redirLocHeader=1' */);
 	exit(0);
