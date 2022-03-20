@@ -21,6 +21,7 @@ class pemsDoit {
 				$url = $gdo->forceGetOAuthURL(); 
 				$gdo->revokeToken();
 				dao_plain::deleteTokenStatic();
+				dao::expireCookies();
 				kwas(false, 'revoking');
 			}
 			$ulo->putUse($gdo->check()); // *** get text / pre value of check, then check limit then check email

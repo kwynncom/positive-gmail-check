@@ -9,8 +9,7 @@ class isucookie {
 	
 	static function   set() { 
 		$lt = time() + self::cex;
-		$o = ['expires' => $lt, 'secure' => true, 'httponly' => true, 'samesite' => 'Strict'];
-		setcookie(self::cnm, true, $o); 
+		kwscookie(self::cnm, true); 
 		
 	}
 	static function unset() { 
