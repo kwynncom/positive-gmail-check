@@ -34,19 +34,28 @@ class dao_plain {
 		    ['$set' => ['gtok' => $tok, 'sid1' => vsid(), 'sids' => [vsid()]]],
 		    ['upsert' => true]
 	    );
-
-    }
+   }
+   
+   private function freshOrRefresh($tin) {
+	   if (isset( $tin['refresh_token'])) return (array) $tin;
+	   $fs = ['access_token', 'created', 'expires_in'];
+	   foreach($fs as $f) if (!isset($tin[$f]))  return false;
+	   
+	   $d = time() - ($tin['created'] + $tin['expires_in']); 
+	   if ($d <= 0) return (array) $tin;
+	   return false;
+   }
     
     public function getToken() {
 
         $rest1 = $this->tokc->findOne(['sids' => ['$in' => [vsid()]]]); 
-	if ($rest1 && isset($rest1->gtok)) return (array) $rest1->gtok;
-	
-	
-	$ress1 = $this->sessc->findOne(['sid' => ['$eq' => vsid()]]); 
-	
-	if (isset($ress1->tgtok)) return (array) $ress1->tgtok;
-	return false;
+		if ($rest1 && isset($rest1->gtok)) return $this->freshOrRefresh($rest1->gtok);
+
+
+		$ress1 = $this->sessc->findOne(['sid' => ['$eq' => vsid()]]); 
+
+		if (isset($ress1->tgtok)) return $this->freshOrRefresh($ress1->tgtok);
+		return false;
     }
     
     public function updateToken($token) {

@@ -1,6 +1,7 @@
 <?php
 
 require_once('dao.php');
+require_once('isUserCookie.php');
 
 function vsid() { return hash('sha256', ptvsid()); }
 
@@ -28,6 +29,7 @@ public function getToken() {
 public static function expireCookies() {
 	$fs = ['atkey', 'rtkey'];
 	foreach($fs as $f) if (isset($_COOKIE[$f])) kwscookie($f, false, false);
+	isucookie::unset();
 }
 
 public function updateToken($tok) { $this->modToken($tok, 'update'); }

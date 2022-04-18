@@ -2,6 +2,7 @@
 
 require_once('serverSwitch.php');
 require_once('dao.php');
+require_once('isUserCookie.php');
 
 class GoogleClientWrapper {
     
@@ -52,8 +53,8 @@ class GoogleClientWrapper {
     }
     
     public static function getOAuthCode() {
-	if (!isset($_REQUEST['code'])) return false;
-	return     $_REQUEST['code'];
+		if (!isset($_REQUEST['code'])) return false;
+		return     $_REQUEST['code'];
     }
     
 	private function setDao() {
@@ -71,8 +72,10 @@ class GoogleClientWrapper {
 		
 		$this->dao->putToken($accessToken);
 
-	header('Location: ' . $this->ssw->getBaseURL() /* . '?redirLocHeader=1' */);
-	exit(0);
+		isucookie::set();
+
+		header('Location: ' . $this->ssw->getBaseURL() . iaacl::getURLQ());
+		exit(0);
     }
     
     public function doOAuth() {
