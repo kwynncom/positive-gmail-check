@@ -63,8 +63,7 @@ class enc_cookies {
 	if (isset($_COOKIE[$cokey])) return $_COOKIE[$cokey];
 	$cikey = self::base62();
 	kwas(isset($cikey[40]), 'key not long enough');
-	$lt = time() + 10 * 86400;
-	kwscookie($cokey, $cikey, $lt);
+	kwscookie($cokey, $cikey, isucookie::getOpts());
 	return $cikey;
     }
     

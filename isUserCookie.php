@@ -5,10 +5,16 @@ require_once('/opt/kwynn/kwutils.php');
 class isucookie {
 	
 	const cnm = 'pemck_user';
+	const expiresS = 10 * DAY_S;
 	
-	static function   set() { kwscookie(self::cnm, true); }
+	static function   set() { kwscookie(self::cnm, true, self::getOpts()); }
 	static function unset() { setcookie(self::cnm, false, time() - 100000); }
 	static function is()  {	return kwifs($_COOKIE, self::cnm);	}
+	
+	public static function getOpts() { 
+		$p = dirname($_SERVER['PHP_SELF']);
+		return ['path' => $p, 'expires' => time() + self::expiresS];
+	}
 }
 
 class iaacl {
