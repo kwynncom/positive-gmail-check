@@ -20,20 +20,26 @@ class isucookie {
 class iaacl extends dao_generic_3 implements qemconfig {
 	
 	const timeoutS = 30;
-	const codeLen  = 10;
-	const Uoff = 1650864934;
+	const cleanDBAfterS = self::timeoutS * 1.5;
+	const codeLen  = 6;
+	const codeName = 'c';
+	const Uoff = 1650866251;
+
 	
 	private function __construct() {
 		parent::__construct(self::dbname);
 		$this->creTabs('authHandoff');
+		$this->cleanDB();
 	}
+	
+	private function cleanDB() { $this->acoll->deleteMany(['U' => ['$lt' => time() - self::cleanDBAfterS]]); }
 	
 	public static function getURLQ() { 
 		$o = new self();
 		$uq = $o->getURLQI();
 		$t = '';
 		$t .= '?' . $uq;
-		if (ispkwd() && 1) $t .= '&XDEBUG_SESSION_START=netbeans-xdebug';
+		if (0 && ispkwd()) $t .= '&XDEBUG_SESSION_START=netbeans-xdebug';
 		return $t;
 	}
 	
@@ -54,7 +60,7 @@ class iaacl extends dao_generic_3 implements qemconfig {
 	public function getURL20I($ts, $code) {
 		$t  = '';
 		$t .= 'U=' . dechex($ts - self::Uoff);
-		$t .= '&code=' . $code;
+		$t .= '&' . self::codeName . '=' . $code;
 		return $t;
 	}
 	
@@ -64,7 +70,7 @@ class iaacl extends dao_generic_3 implements qemconfig {
 		$tsi = intval($ts); unset($ts);
 		$tsi += self::Uoff;
 		kwas((abs($tsi - time()) <= self::timeoutS), 'bad URL query iaacl isUCook pemck');
-		$code = isrv('code');
+		$code = isrv(self::codeName);
 		kwas(preg_match('/^[A-Za-z0-9]+$/', $code), 'invalid code format pemck iaacl 0113');
 		kwas(strlen(trim($code)) === self::codeLen, 'invalid code format 20 pemck');
 		return ['code' => $code, 'U' => $tsi];
@@ -73,9 +79,11 @@ class iaacl extends dao_generic_3 implements qemconfig {
 	
 	public function isiaaI() {
 		try {
-			$q = $this->getValidQ();
+			$uq = $q = $this->getValidQ();
+			$q['used'] = false;
 			$r = $this->acoll->findOne($q);
 			kwas($r && isset($r['U']), 'URL Q not found iaacl pemck');
+			$this->acoll->upsert($uq, ['used' => true]);
 			$now = time();
 			$d = $now - ($r['U'] + self::timeoutS);
 			kwas(is_numeric($d), 'not numeric isiaaI pemck 0052');
