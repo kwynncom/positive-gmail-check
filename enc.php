@@ -1,7 +1,6 @@
 <?php
 
 require_once('dao.php');
-require_once('isUserCookie.php');
 
 function vsid() { return hash('sha256', ptvsid()); }
 

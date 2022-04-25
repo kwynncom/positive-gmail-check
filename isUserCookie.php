@@ -1,6 +1,6 @@
 <?php
 
-require_once('/opt/kwynn/kwutils.php');
+require_once('config.php');
 
 class isucookie {
 	
@@ -17,27 +17,76 @@ class isucookie {
 	}
 }
 
-class iaacl {
+class iaacl extends dao_generic_3 implements qemconfig {
 	
-	const iaareq = 'pemck_iaa';
-	const iaapre = '/tmp/' . self::iaareq . '_';
 	const timeoutS = 30;
+	const codeLen  = 10;
+	const Uoff = 1650864934;
+	
+	private function __construct() {
+		parent::__construct(self::dbname);
+		$this->creTabs('authHandoff');
+	}
 	
 	public static function getURLQ() { 
-		$fn = self::iaapre . dao_generic_3::get_oids(true);
+		$o = new self();
+		$uq = $o->getURLQI();
+		$t = '';
+		$t .= '?' . $uq;
+		if (ispkwd() && 1) $t .= '&XDEBUG_SESSION_START=netbeans-xdebug';
+		return $t;
+	}
+	
+	public function getURLQI() {
+		$dat = [];
+		$dat['_id' ] = dao_generic_3::get_oids(false);
 		$now = time();
-		file_put_contents($fn, $now);
-		return '?' . self::iaareq . '=' . $fn . '&XDEBUG_SESSION_START=netbeans-xdebug';
+		$dat['code'] = $code = $this->getCode();
+		$dat['U'  ] = $now;
+		$dat['r'  ] = date('r', $now);
+		$dat['used'] = false;
+		$this->acoll->insertOne($dat);
+		return $this->getURL20I($now, $code);
+	}
+	
+	private function getCode() { return base62(self::codeLen);	}
+	
+	public function getURL20I($ts, $code) {
+		$t  = '';
+		$t .= 'U=' . dechex($ts - self::Uoff);
+		$t .= '&code=' . $code;
+		return $t;
+	}
+	
+	private function getValidQ() {
+		$hex = isrv('U'); 
+		$ts = hexdec($hex); unset($hex); kwas($ts && is_numeric($ts), 'bad URL query iaacl pemck 0137');
+		$tsi = intval($ts); unset($ts);
+		$tsi += self::Uoff;
+		kwas((abs($tsi - time()) <= self::timeoutS), 'bad URL query iaacl isUCook pemck');
+		$code = isrv('code');
+		kwas(preg_match('/^[A-Za-z0-9]+$/', $code), 'invalid code format pemck iaacl 0113');
+		kwas(strlen(trim($code)) === self::codeLen, 'invalid code format 20 pemck');
+		return ['code' => $code, 'U' => $tsi];
+		
+	}
+	
+	public function isiaaI() {
+		try {
+			$q = $this->getValidQ();
+			$r = $this->acoll->findOne($q);
+			kwas($r && isset($r['U']), 'URL Q not found iaacl pemck');
+			$now = time();
+			$d = $now - ($r['U'] + self::timeoutS);
+			kwas(is_numeric($d), 'not numeric isiaaI pemck 0052');
+			return $d <= 0;	
+		} catch(Exception $ex) { return false; }
+	
 	}
 	
 	public static function isiaa() {
-		$fn = isrv(self::iaareq);
-		if (!$fn) return false;
-		if (!($ftr = file_get_contents($fn))) return false;
-		$ft = intval(trim($ftr));
-		$now = time();
-		$d = $now - ($ft + self::timeoutS);
-		return $d <= 0;
+		$o = new self();
+		return $o->isiaaI();
 	}
 	
 	

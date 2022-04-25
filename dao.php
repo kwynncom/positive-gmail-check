@@ -1,13 +1,8 @@
 <?php
 
-set_include_path('/opt/composer' . PATH_SEPARATOR . get_include_path());
-require_once('vendor/autoload.php');
-require_once('enc.php');
+require_once('config.php');
 
-
-class dao_plain {
-
-    const dbname = 'qemail';
+class dao_plain implements qemconfig {
     
     function __construct() {
     	$this->client = new MongoDB\Client();
