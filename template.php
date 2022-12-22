@@ -189,5 +189,6 @@ class kwpemck {
 			</div>
 		</div>
 	</div>
+	<p><a href='/'>home</a> <a href='/t/6/07/ql/quick_links.html' style='padding-left: 10vw; '>ql</a></p>
 </body>
 </html>

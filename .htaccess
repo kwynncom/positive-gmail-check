@@ -1,4 +1,5 @@
-# Google OAUTH
+# located at https://kwynn.com/t/7/12/email/
 RewriteEngine On
+RewriteRule cookieMgrKw /t/22/08/cookies/server.php
 RewriteCond %{QUERY_STRING} !^.*XDEBUG.*$
 RewriteRule   receiveAuthCode.php(.*)$  https://%{HTTP_HOST}/t/7/12/email/receiveAuthCode.php?XDEBUG_SESSION_START=netbeans-xdebug&%{QUERY_STRING} [L,NE]

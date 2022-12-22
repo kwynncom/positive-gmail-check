@@ -29,8 +29,9 @@ class serverSwitch {
     
     private function set() {
 		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  self::thisupath;
-		$mo = new mongoToFile(dao_plain::dbname, self::clientSecretName, false, [$this, 'sortURLs']);
-		$fname = $mo->getFName();
+		// $mo = new mongoToFile(dao_plain::dbname, self::clientSecretName, false, [$this, 'sortURLs']);
+		// $fname = $mo->getFName();
+		$fname = '/var/kwynn/gooauth/positive_email_secret.txt';
 		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
 		kwas(file_exists($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30);
 		$this->settings = $set;

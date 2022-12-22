@@ -15,21 +15,18 @@ I never really intended for anyone else to use it on my server.  On one hand, yo
 it.  You're also free to run your own copy.
 
 With that said, it is running at https://kwynn.com/t/7/12/email/  .  It will immediately take you to an OAUTH screen.
-******
-RUNNING STUFF - A DEVELOPMENT (NOT LIVE) ISSUE
-
-The following only happens in development, because the live version has been very, very reliable.  The probably may be a conflict between live and 
-dev.  I suspect I am not handling an error properly.
-
-There is a situation in which the system breaks and the solution is to delete the OAUTH tokens, probably both in sessions and the gootokens 
-(or whatever I called it) table / collection.  Specifically, I think a $code keeps going through ahd through repeatedly--the redirect gets 
-called repeatedly--but the system still won't auth.
-
-Ideally I would track this down; we'll see.
-
-It looks like I only keep auth data in the go / goo collection when there is a refresh token; otherwise I keep it only in the sessions 
-collection.  In this case I mean the final auth data--access tokens and refresh tokens.
 *****
+Updates - 2022/12/21
+
+In this file, there were a couple of notes I'm deleting.  
+
+Today I'm going to work on abstracting OAUTH2 from the specific GMail usage, or further abstracting.
+
+I was using "FileToMongo" code.  I think I'm going to get rid of that, too, and just use files outside of the DOCUMENT_ROOT.  That is, 
+I'm changing how I store the input and output secrets--input and output relative to in and out of Big Evil Goo(gle).  I have to do this for a 
+client.  Otherwise, I might think about getting away from Goo finally.
+******
+
 INSTALLATION STUFF
 
 **
