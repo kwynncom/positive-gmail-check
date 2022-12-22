@@ -2,7 +2,6 @@
 
 require_once('util.php');
 require_once('dao.php');
-require_once('/opt/kwynn/creds.php');
 require_once('FileToMongo/FileToMongo_general.php');
 require_once('sortURLs.php');
 
