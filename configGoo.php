@@ -10,12 +10,10 @@ class configGooOAUTH2 {
     
 	const gooApps = ['positiveEmail' => 
 						[ 
-							// 'file'  => '/var/kwynn/gooauth/positive_email_secret.txt', 
-							   'sfb' =>  '/var/kwynn/gooauth/lawyer_secret_2',
+							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
 							'sfx' => '.json',
-						  'scopes' => 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.metadata',
-						  // 'scopes' => Google_Service_Gmail::GMAIL_METADATA, 
-						  'upath' => '/t/7/12/email/',
+							'scopes' => Google_Service_Gmail::GMAIL_METADATA, 
+							'upath' => '/t/7/12/email/',
 						   'asfx' => 'intro.php',
 							'osfx' => '_live_active_output'
 							]
@@ -62,7 +60,7 @@ class configGooOAUTH2 {
 		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  self::gooApps[$this->oapp]['upath'];
 		$fname = self::gooApps[$this->oapp]['sfb'] . self::gooApps[$this->oapp]['sfx'];
 		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
-		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30);
+		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 'cannot read secret file - the input-only version');
 		$this->settings = $set;
     }
     
