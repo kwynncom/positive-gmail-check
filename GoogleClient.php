@@ -1,18 +1,25 @@
 <?php
 
-require_once('serverSwitch.php');
+require_once('configGoo.php');
 require_once('dao.php');
 require_once('isUserCookie.php');
 
 class GoogleClientWrapper {
+	
+	function __destruct() {
+		if (!isset($this->client)) return;
+		$this->ssw->fileToken($this->client->getAccessToken());
+	}
     
 	public static function fromRedirectURL() {
-		new self(true);
+		new self();
 	}
 	
-    function __construct($fromRU = false) {
+	public function getScopes() { return $this->ssw->getScopes(); }
 	
-		$this->ssw = new serverSwitch();
+    function __construct(string $gooApp = '') {
+	
+		$this->ssw = new configGooOAUTH2($gooApp);
 		$path = $this->ssw->getPath();
 
 		$client = new Google_Client();
@@ -21,12 +28,13 @@ class GoogleClientWrapper {
 		$client->setIncludeGrantedScopes(true);
 		$this->client = $client;
 
-		if ($fromRU) $this->processAuthCode();
+		// if ($fromRU)  // ****?????
+		$this->processAuthCode(); 
 	
 		$this->setDao();
     }
     
-    public function addScope($scope) { $this->client->addScope($scope);  }
+    public function setScopes($scope) { $this->client->setScopes($scope);  }
     
     public function getGoogleClient() { return $this->client; }
     

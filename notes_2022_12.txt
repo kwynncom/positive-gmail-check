@@ -7,3 +7,4 @@ change ownership and group
 chmod 660 newFile
 # I think this is both read and write, or will be, so need both ways.
 # On second thought, maybe read-only.  I'll straighten out the confusion soon.
+# remember WEB type creds with redirect URLs - web application

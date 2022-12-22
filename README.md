@@ -25,8 +25,16 @@ Today I'm going to work on abstracting OAUTH2 from the specific GMail usage, or 
 I was using "FileToMongo" code.  I think I'm going to get rid of that, too, and just use files outside of the DOCUMENT_ROOT.  That is, 
 I'm changing how I store the input and output secrets--input and output relative to in and out of Big Evil Goo(gle).  I have to do this for a 
 client.  Otherwise, I might think about getting away from Goo finally.
-******
 
+further update 2022/12/22
+
+A few hours ago I ran into Google' OAUTH's OOB (out of band) error.  This translates to using oauth.py or otherwise authorizing "by hand."  
+
+I modified this code for a client so that I could get access to the live token file.  The first secret file is in fact read-only.  That one 
+does not contain any auth tokens.  The one that I'm writing contains the live tokens.
+******
+Remember to explain the .htaccess - 2022/12
+****
 INSTALLATION STUFF
 
 **

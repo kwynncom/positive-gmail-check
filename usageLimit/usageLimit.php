@@ -21,7 +21,6 @@ class usageLimit {
 	$this->lim = $lim;
 
 	$this->dao = new daoUsage();
-	$this->ssw = new serverSwitch();
     }
     
     public function setEmail($email) { $this->dao->setEmail($email); }
