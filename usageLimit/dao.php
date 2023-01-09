@@ -1,12 +1,16 @@
 <?php
 
-class daoUsage {
+
+require_once(__DIR__ . '/../configDB.php');
+require_once(__DIR__ . '/../dao.php');
+
+class daoUsage implements qemconfig {
     
     private $iid = null;
     
     function __construct() {
 	$this->client = new MongoDB\Client();
-	$this->usage = $this->client->selectCollection(dao::dbname, 'usage');
+	$this->usage = $this->client->selectCollection(dao_plain::dbname, 'usage');
 	$this->usage->deleteMany(['time' => ['$lt' => time() - 86400 * 30]]);
     }
     

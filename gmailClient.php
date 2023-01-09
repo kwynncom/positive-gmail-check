@@ -1,9 +1,9 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
-require_once('dao.php');
+require_once('enc.php');
 require_once('testMode.php');
-require_once('configGoo.php');
+require_once('configPosEmail.php');
 require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
 require_once('isUserCookie.php');
@@ -25,7 +25,7 @@ class gmailClient {
 
 	$this->dao = new dao();
 	
-	$client = new GoogleClientWrapper('positiveEmail');
+	$client = new GoogleClientWrapper(new posEmailConfigForGoo());
 	$client->setScopes($client->getScope());
 	$token = $client->setToken(); // must be called from outside because after scope
 	$this->client = $client;

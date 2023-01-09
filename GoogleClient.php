@@ -1,6 +1,5 @@
 <?php
 
-require_once('configGoo.php');
 require_once('dao.php');
 require_once('isUserCookie.php');
 
@@ -24,9 +23,9 @@ class GoogleClientWrapper {
 	
 	public function getScope() { return $this->ssw->getScope(); }
 	
-    function __construct(string $gooApp = '') {
+    function __construct($cono) {
 	
-		$this->ssw = new configGooOAUTH2($gooApp);
+		$this->ssw = $cono;
 		$path = $this->ssw->getSecretFilePath();
 
 		$client = new Google_Client();
