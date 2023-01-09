@@ -1,11 +1,9 @@
 <?php
 
-interface GooOAuthAppConfigI {
-	public function getBaseURL();
-	public function fileToken(mixed $tok);
+interface GooOAuthAppConfigI { // some of these aren't needed anymore
+	public function saveToken(mixed $tok);
 	public function getScope();
 	public function getSecretFilePath();
-	public function getURLSfx();
-	public function uponAuth();
+	public function doUponAuth();
 	public function getRedirectURL();
 }

@@ -7,7 +7,7 @@ class GoogleClientWrapper {
 	
 	function __destruct() {
 		if (!isset($this->client)) return;
-		$this->ssw->fileToken($this->client->getAccessToken());
+		$this->ssw->saveToken($this->client->getAccessToken());
 	}
     
 	public static function fromRedirectURL() {
@@ -86,10 +86,7 @@ class GoogleClientWrapper {
 		
 		$this->ssw->uponAuth();
 
-		// isucookie::set();
-		// header('Location: ' . $this->ssw->getBaseURL() . $this->ssw->getURLSfx());
-		
-		exit(0);
+//		exit(0);
     }
     
     public function doOAuth() {
