@@ -6,6 +6,8 @@ require_once('isUserCookie.php');
 
 class GoogleClientWrapper {
 	
+	const redExt = 'receiveAuthCode.php';
+	
 	function __destruct() {
 		if (!isset($this->client)) return;
 		$this->ssw->fileToken($this->client->getAccessToken());
@@ -15,12 +17,17 @@ class GoogleClientWrapper {
 		new self();
 	}
 	
+	private function getRedirectURL() { 
+		return $this->ssw->getBaseURL() . self::redExt; 
+		
+	}
+	
 	public function getScope() { return $this->ssw->getScope(); }
 	
     function __construct(string $gooApp = '') {
 	
 		$this->ssw = new configGooOAUTH2($gooApp);
-		$path = $this->ssw->getPath();
+		$path = $this->ssw->getSecretFilePath();
 
 		$client = new Google_Client();
 		$client->setAuthConfig($path);
@@ -28,7 +35,6 @@ class GoogleClientWrapper {
 		$client->setIncludeGrantedScopes(true);
 		$this->client = $client;
 
-		// if ($fromRU)  // ****?????
 		$this->processAuthCode(); 
 	
 		$this->setDao();
@@ -89,7 +95,7 @@ class GoogleClientWrapper {
     public function doOAuth() {
 	$this->dao->deleteToken();
 	$this->processAuthCode();
-	$this->client->setRedirectUri($this->ssw->getRedirectURL());
+	$this->client->setRedirectUri($this->getRedirectURL());
 	$auth_url = $this->client->createAuthUrl();
 	$this->oauthurl = $auth_url;
     }

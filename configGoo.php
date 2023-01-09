@@ -2,10 +2,10 @@
 
 require_once('util.php');
 require_once('dao.php');
-require_once('FileToMongo/FileToMongo_general.php');
 require_once('sortURLs.php');
+require_once('configInterface.php');
 
-class configGooOAUTH2 {
+class configGooOAUTH2 implements GooOAuthAppConfigI {
     
 	const gooApps = ['positiveEmail' => 
 						[ 
@@ -18,7 +18,6 @@ class configGooOAUTH2 {
 							]
 			];
 	
-    const redExt = 'receiveAuthCode.php';
 	
 	private $oapp;
 	
@@ -53,7 +52,7 @@ class configGooOAUTH2 {
 		
 	}
  
-    public function getPath() { return $this->settings['goopath']; }
+    public function getSecretFilePath() { return $this->settings['goopath']; }
     
     private function set() {
 		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  self::gooApps[$this->oapp]['upath'];
@@ -69,10 +68,7 @@ class configGooOAUTH2 {
 	}
 	
     public function getBaseURL    () { return $this->urlbase; }
-    public function getRedirectURL() { 
-		return $this->getBaseURL() . self::redExt; 
-		
-	}
+
     
     function __construct(string $gooApp) {
 		if ($gooApp) $this->oapp = $gooApp;

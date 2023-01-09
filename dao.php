@@ -1,6 +1,6 @@
 <?php
 
-require_once('config.php');
+require_once('configDB.php');
 
 class dao_plain implements qemconfig {
     
