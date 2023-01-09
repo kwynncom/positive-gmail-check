@@ -11,7 +11,7 @@ class configGooOAUTH2 {
 						[ 
 							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
 							'sfx' => '.json',
-							'scopes' => Google_Service_Gmail::GMAIL_METADATA, 
+							'scope' => Google_Service_Gmail::GMAIL_METADATA, 
 							'upath' => '/t/7/12/email/',
 						   'asfx' => 'intro.php',
 							'osfx' => '_live_active_output'
@@ -43,8 +43,8 @@ class configGooOAUTH2 {
 		
 	}
 	
-	public function getScopes() {
-		return self::gooApps[$this->oapp]['scopes'];
+	public function getScope() {
+		return self::gooApps[$this->oapp]['scope'];
 	}
 	
 	public static function getThisAPath() { 

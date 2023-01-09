@@ -15,7 +15,7 @@ class GoogleClientWrapper {
 		new self();
 	}
 	
-	public function getScopes() { return $this->ssw->getScopes(); }
+	public function getScope() { return $this->ssw->getScope(); }
 	
     function __construct(string $gooApp = '') {
 	
