@@ -5,8 +5,6 @@ require_once('isUserCookie.php');
 
 class GoogleClientWrapper {
 	
-	const redExt = 'receiveAuthCode.php';
-	
 	function __destruct() {
 		if (!isset($this->client)) return;
 		$this->ssw->fileToken($this->client->getAccessToken());
@@ -17,9 +15,10 @@ class GoogleClientWrapper {
 	}
 	
 	private function getRedirectURL() { 
-		return $this->ssw->getBaseURL() . self::redExt; 
+		return $this->ssw->getRedirectURL();
 		
 	}
+
 	
 	public function getScope() { return $this->ssw->getScope(); }
 	
@@ -84,10 +83,12 @@ class GoogleClientWrapper {
 		$this->setDao();
 		
 		$this->dao->putToken($accessToken);
+		
+		$this->ssw->uponAuth();
 
-		isucookie::set();
-
-		header('Location: ' . $this->ssw->getBaseURL() . iaacl::getURLQ());
+		// isucookie::set();
+		// header('Location: ' . $this->ssw->getBaseURL() . $this->ssw->getURLSfx());
+		
 		exit(0);
     }
     

@@ -1,4 +1,7 @@
 <?php
 
 require_once('GoogleClient.php');
-GoogleClientWrapper::fromRedirectURL();
+require_once('configPosEmail.php');
+
+new GoogleClientWrapper(new posEmailConfigForGoo());
+

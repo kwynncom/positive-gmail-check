@@ -5,6 +5,13 @@ require_once('configInterface.php');
 
 class configForGooGen implements GooOAuthAppConfigI {
   	
+	public function uponAuth() {}
+	
+	public function getRedirectURL() {
+		kwas(false, 'redirect URL undefined');
+	}
+
+	
 	public function fileToken($din) {
 		$a = $this->thea;
 		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
@@ -28,9 +35,10 @@ class configForGooGen implements GooOAuthAppConfigI {
     }
     
     public function getBaseURL    () { return $this->urlbase; }
+	
+	public function getURLSfx() { return ''; }
 
-    
-    function __construct($ain) {
+	function __construct($ain) {
 		$this->thea = $ain;
 		$this->set();
     }
