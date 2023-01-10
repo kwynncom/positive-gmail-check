@@ -18,8 +18,9 @@ class pemsDoit {
 			$gdo = new gmailClient();
 			if (doRevoke()) {
 				isucookie::unset();
-				$url = $gdo->forceGetOAuthURL(); 
-				$gdo->revokeToken();
+				$gco = new posEmailConfigForGoo();
+				$url = $gco->forceGetOAuthURL(); 
+				$gco->revokeToken();
 				dao_plain::deleteTokenStatic();
 				dao::expireCookies();
 				kwas(false, 'revoking');
@@ -30,7 +31,10 @@ class pemsDoit {
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-		if (!isset($url) && isset($gdo)) $url = $gdo->getOAuthURL(); 
+		if (!isset($url) && isset($gco)) {
+			$gco = new posEmailConfigForGoo();
+			$url = $gco->getOAuthURL(); 
+		}
 
 		unset($gdo);
 		

@@ -90,9 +90,15 @@ class GoogleClientWrapper {
 			}
 		}
 	
-		return true;
+		$this->initTokenSet = true;
+		return $this->initTokenSet;
     }
     
+	public function initTokenStatus() {
+		if (isset($this->initTokenSet)) return $this->initTokenSet;
+		else return false;
+	}
+	
     private static function getOAuthCode() {
 		if (!isset($_REQUEST['code'])) return false;
 		return     $_REQUEST['code'];

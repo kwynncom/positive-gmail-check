@@ -20,8 +20,7 @@ class gmailClient {
 
 		$client = new posEmailConfigForGoo();
 		$this->client = $client;
-
-		// if (!$token) $this->cannotCheck = true; // ** REWORK AND RESTORE
+		if (!$this->client->initTokenStatus()) $this->cannotCheck = true;
     }
     
     public function getRefCount() { return count($this->refs); } 
@@ -59,24 +58,5 @@ class gmailClient {
 		else if (is_array($msgRefs)) return count($msgRefs);
 		else return 'nock';
     }
-    
-	public function forceGetOAuthURL() {
-	 if (!isset($this->client)) return false;		
-		return $this->client->forceGetOAuthURL();
-	}
-	
-    public function getOAuthURL() {
-	 if (!isset($this->client)) return false;
-	 header('Access-Control-Allow-Origin:  https://accounts.google.com');
-	 $url = $this->client->getOAuthURL();
-	 return $url;
-    }
-    
-    public function revokeToken() {
-	$x = 2;
-	$this->dao->deleteToken();
-	$res = $this->client->revokeToken();
-	$y = 3;
-    }
-    
+   
 } // end class
