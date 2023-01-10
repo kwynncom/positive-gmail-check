@@ -1,7 +1,8 @@
 <?php
 
 require_once('dao.php');
-require_once('configForGooGen.php');
+require_once('GoogleClient.php');
+// require_once('configForGooGen.php');
 require_once('util.php');
 require_once('isUserCookie.php');
 
@@ -19,6 +20,8 @@ class posEmailConfigForGoo extends GoogleClientWrapper {
 	
 	public function __construct() { 
 		parent::__construct(self::peoaa); 	
+		$this->setScopes($this->getScope());
+		$this->setToken(); // must be called from outside because after scope
 	}
 
 	public function doUponAuth() {
@@ -26,5 +29,7 @@ class posEmailConfigForGoo extends GoogleClientWrapper {
 		header('Location: ' . $this->getBaseURL() . iaacl::getURLQ());
 		exit(0);
 	}
+	
+
 	
 }

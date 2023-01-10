@@ -19,11 +19,9 @@ class gmailClient {
 		$this->dao = new dao();
 
 		$client = new posEmailConfigForGoo();
-		$client->setScopes($client->getScope());
-		$token = $client->setToken(); // must be called from outside because after scope
 		$this->client = $client;
 
-		if (!$token) $this->cannotCheck = true;
+		// if (!$token) $this->cannotCheck = true; // ** REWORK AND RESTORE
     }
     
     public function getRefCount() { return count($this->refs); } 
