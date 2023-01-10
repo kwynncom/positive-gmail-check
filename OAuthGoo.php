@@ -1,7 +1,6 @@
 <?php
 
-require_once('dao.php');
-require_once('isUserCookie.php');
+// require_once('isUserCookie.php');
 
 class GooOAUTHWrapper {
 	
@@ -35,8 +34,6 @@ class GooOAUTHWrapper {
 		$this->client = $client;
 
 		$this->processAuthCode(); 
-	
-		$this->setDao();
 		
 		$this->client->setScopes($this->thea['scope']);
 		$this->setToken();
@@ -48,9 +45,14 @@ class GooOAUTHWrapper {
 		$res = $this->client->revokeToken(); // returns boolean true on success
     }
     
+	protected function getToken() { // MUST be protected so it can be overridden.
+		return false; 
+		
+	}
+	
     private function setToken() {
 		
-		$accessToken = $this->dao->getToken();
+		$accessToken = $this->getToken();
 		if (!$accessToken) return $this->doOAuth();
 		else {
 				$this->client->setAccessToken($accessToken);
@@ -78,30 +80,23 @@ class GooOAUTHWrapper {
 		return     $_REQUEST['code'];
     }
     
-	private function setDao() {
-		if (!isset($this->dao)) $this->dao = new dao();		
-	}
+	private function deleteToken() {}
 	
     private function processAuthCode() {
 		
 		if (!($code = $this->getOAuthCode())) return false;
         
 		$res = $this->client->authenticate($code);
-		$this->setDao();
-		$this->dao->deleteToken();
+		$this->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
         $accessToken = $this->client->getAccessToken();
-		$this->setDao();
-		
-		$this->dao->putToken($accessToken);
-		
-		$this->doUponAuth();
+		$this->doUponAuth($accessToken);
 
 		exit(0); // probably a good idea
     }
     
     public function doOAuth() {
-		$this->dao->deleteToken();
+		$this->deleteToken();
 		$this->processAuthCode();
 		$this->client->setRedirectUri($this->urlbase . $this->thea['redbase']);
 		$auth_url = $this->client->createAuthUrl();

@@ -14,24 +14,35 @@ class posEmailOAuth extends GooOAuthWrapper {
 							'sfx' => '.json',
 							'scope' => Google_Service_Gmail::GMAIL_METADATA, 
 							'upath' => '/t/7/12/email/',
-						   'asfx' => 'intro.php',
 							'osfx' => '_live_active_output',
 							'redbase' => 'receiveAuthCode.php',
 							];
 	
 	public function __construct() { 
-		parent::__construct(self::peoaa); 	
+		$this->setDao();
+		parent::__construct(self::peoaa);
 	}
 
-	public function doUponAuth() {
+	public function doUponAuth($tok) {
 		isucookie::set();
+		$this->dao->putToken($tok);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}
 	
 	public function revokeToken() {
-		$dao = new dao();
-		$dao->deleteToken();
+		$this->deleteToken();
 		$res = parent::revokeToken();
     }
+	
+	private function deleteToken() {		$this->dao->deleteToken();			}
+	
+	protected function getToken() {
+		return $this->dao->getToken();	
+	}
+
+	
+	private function setDao() {	$this->dao = new dao();	}
+	
+	private function blahChild() {}
 }
