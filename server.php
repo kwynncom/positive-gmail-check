@@ -36,12 +36,12 @@ class pemsDoit {
 			$url = $gco->getOAuthURL(); 
 		}
 
-		unset($gdo);
+		unset($gdo, $gco);
 		
 		$now   = time();
 		$dates = date('g:i A', $now) . ' (' . date('s', $now) . 's) ' . date('l, F j, Y', $now); unset($now);
 		$glt = $ulo->getLimitsTxt();
-		$dvs = get_defined_vars();
+		$dvs = get_defined_vars(); // **** This may be a bad idea.  Subject to clutter.
 		$this->doerr ($dvs);
 		$this->dook10($dvs);
 	}
