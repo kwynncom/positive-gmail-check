@@ -18,7 +18,8 @@ class proj2Test extends GooOAuthWrapper {
 		parent::__construct(self::peoaa); 	
 	}
 
-	public function doUponAuth() {
+	public function doUponAuth($tok) {
+		$this->saveToken($tok);
 		header('Location: ' .  $this->urlbase . 'result.php');
 		exit(0);
 	}
