@@ -7,7 +7,7 @@ require_once('util.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
 
-class posEmailConfigForGoo extends GooOAuthWrapper {
+class posEmailOAuth extends GooOAuthWrapper {
 
 	const peoaa = [
 							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 

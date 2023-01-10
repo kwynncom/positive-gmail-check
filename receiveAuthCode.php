@@ -2,4 +2,4 @@
 
 require_once('OAuthPosEmail.php');
 
-new posEmailConfigForGoo();
+new posEmailOAuth();

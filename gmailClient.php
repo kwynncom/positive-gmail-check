@@ -18,7 +18,7 @@ class gmailClient {
 
 		$this->dao = new dao();
 
-		$client = new posEmailConfigForGoo();
+		$client = new posEmailOAuth();
 		$this->client = $client;
 		if (!$this->client->initTokenStatus()) $this->cannotCheck = true;
     }
