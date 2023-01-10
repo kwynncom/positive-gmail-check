@@ -13,9 +13,12 @@ class GooOAUTHWrapper {
     }
 
 	public function saveToken($din) {
-		$a = $this->thea;
-		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
-		file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));		
+		
+		if (false) { 
+			$a = $this->thea;
+			$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
+			file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));	
+		}
 	}
 	
 	function __destruct() {
