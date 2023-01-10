@@ -20,9 +20,7 @@ class posEmailConfigForGoo extends configForGooGen {
 	public function __construct() { 
 		parent::__construct(self::peoaa); 	
 	}
-	
-	public function getRedirectURL() { return $this->getBaseURL() . self::peoaa['redbase']; }
-	
+
 	public function doUponAuth() {
 		isucookie::set();
 		header('Location: ' . $this->getBaseURL() . iaacl::getURLQ());

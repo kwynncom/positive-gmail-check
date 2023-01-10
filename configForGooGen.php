@@ -10,11 +10,6 @@ class configForGooGen implements GooOAuthAppConfigI {
 	
 	public function doUponAuth() {}
 	
-	public function getRedirectURL() {
-		kwas(false, 'redirect URL undefined');
-	}
-
-	
 	public function saveToken($din) {
 		$a = $this->thea;
 		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
@@ -47,5 +42,11 @@ class configForGooGen implements GooOAuthAppConfigI {
 		// $wro = new GoogleClientWrapper();
 		
 	}
+	
+	public function getRedirectURL() { 
+		return $this->getBaseURL() . $this->thea['redbase']; 
+		
+	}
+
  
 }
