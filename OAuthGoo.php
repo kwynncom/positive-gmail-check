@@ -1,6 +1,6 @@
 <?php
 
-// require_once('isUserCookie.php');
+require_once('/opt/kwynn/kwutils.php');
 
 class GooOAUTHWrapper {
 	

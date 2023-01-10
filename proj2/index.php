@@ -16,7 +16,7 @@
 		<a href='https://github.com/kwynncom/positive-gmail-check'>source code</a> is available to you can set it up to work, though.
 	</p>
 	
-	<p><a href='./receiveAuthCode.php'>Do / try an OAUTH</a>.</p>
+	<p><a href='receiveAuthCodeP2.php'>Do / try an OAUTH</a>.</p>
 	
 </body>
 </html>
