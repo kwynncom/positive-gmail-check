@@ -5,23 +5,55 @@ require_once('isUserCookie.php');
 
 class GoogleClientWrapper {
 	
-	function __destruct() {
-		if (!isset($this->client)) return;
-		$this->ssw->saveToken($this->client->getAccessToken());
-	}
-    
-	private function getRedirectURL() { 
-		return $this->ssw->getRedirectURL();
-		
-	}
+	// begin from configForGooGen
+	public function getScope() { return $this->thea['scope'];	}
+	
+    public function getSecretFilePath() { return $this->specSettings['goopath']; }
+
+    private function setSpecificConfig() {
+		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  $this->thea['upath'];
+		$fname = $this->thea['sfb'] . $this->thea['sfx'];
+		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
+		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 'cannot read secret file - the input-only version');
+		$this->specSettings = $set;
+    }
+	
+	public function getBaseURL    () { return $this->urlbase; }
 
 	
-	public function getScope() { return $this->ssw->getScope(); }
+	public function getRedirectURL() { 
+		return $this->getBaseURL() . $this->thea['redbase']; 
+		
+	}	
 	
-    function __construct($cono) {
+	// end configForGooGen
+
+	public function saveToken($din) {
+		$a = $this->thea;
+		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
+		file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));		
+		
+		return;
+	}
+		function __destruct() {
+		if (!isset($this->client)) return;
+		$this->saveToken($this->client->getAccessToken());
+	}
+
+    
+	// private function getRedirectURL() { 		return $this->ssw->getRedirectURL();	}
+
 	
-		$this->ssw = $cono;
-		$path = $this->ssw->getSecretFilePath();
+	// public function getScope() { return $this->ssw->getScope(); }
+	
+    function __construct($cdin) {
+		
+		$this->thea = $cdin;
+		
+		$this->setSpecificConfig();
+	
+		// $this->ssw = $cono;
+		$path = $this->getSecretFilePath();
 
 		$client = new Google_Client();
 		$client->setAuthConfig($path);
@@ -83,7 +115,7 @@ class GoogleClientWrapper {
 		
 		$this->dao->putToken($accessToken);
 		
-		$this->ssw->doUponAuth();
+		$this->doUponAuth();
 
 		exit(0); // probably a good idea
     }

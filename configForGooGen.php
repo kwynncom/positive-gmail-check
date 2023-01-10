@@ -4,19 +4,12 @@
 require_once('configInterface.php');
 require_once('GoogleClient.php');
 
-class configForGooGen implements GooOAuthAppConfigI {
+class configForGooGen /* implements GooOAuthAppConfigI */ {
   	
 	public function getGooClientO() { }
 	
 	public function doUponAuth() {}
-	
-	public function saveToken($din) {
-		$a = $this->thea;
-		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
-		file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));		
-		
-		return;
-	}
+
 	
 	public function getScope() { return $this->thea['scope'];	}
 	
@@ -42,6 +35,9 @@ class configForGooGen implements GooOAuthAppConfigI {
 		// $wro = new GoogleClientWrapper();
 		
 	}
+	
+	
+
 	
 	public function getRedirectURL() { 
 		return $this->getBaseURL() . $this->thea['redbase']; 

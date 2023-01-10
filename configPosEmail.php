@@ -5,7 +5,7 @@ require_once('configForGooGen.php');
 require_once('util.php');
 require_once('isUserCookie.php');
 
-class posEmailConfigForGoo extends configForGooGen {
+class posEmailConfigForGoo extends GoogleClientWrapper {
 
 	const peoaa = [
 							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
@@ -26,4 +26,5 @@ class posEmailConfigForGoo extends configForGooGen {
 		header('Location: ' . $this->getBaseURL() . iaacl::getURLQ());
 		exit(0);
 	}
+	
 }

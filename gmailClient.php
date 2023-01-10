@@ -18,7 +18,7 @@ class gmailClient {
 
 		$this->dao = new dao();
 
-		$client = new GoogleClientWrapper(new posEmailConfigForGoo());
+		$client = new posEmailConfigForGoo();
 		$client->setScopes($client->getScope());
 		$token = $client->setToken(); // must be called from outside because after scope
 		$this->client = $client;
