@@ -2,9 +2,12 @@
 
 
 require_once('configInterface.php');
+require_once('GoogleClient.php');
 
-class configForGooGen implements GooOAuthAppConfigI {
+class configForGooGen extends GoogleClientWrapper implements GooOAuthAppConfigI {
   	
+	public function getGooClientO() { }
+	
 	public function doUponAuth() {}
 	
 	public function getRedirectURL() {
@@ -35,6 +38,11 @@ class configForGooGen implements GooOAuthAppConfigI {
 	function __construct($ain) {
 		$this->thea = $ain;
 		$this->set();
+		$this->tokenInit();
     }
+	
+	private function tokenInit() {
+		// $this->ggc = new GoogleClientWrapper();
+	}
  
 }

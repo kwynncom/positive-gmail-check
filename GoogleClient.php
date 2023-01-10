@@ -10,10 +10,6 @@ class GoogleClientWrapper {
 		$this->ssw->saveToken($this->client->getAccessToken());
 	}
     
-	public static function fromRedirectURL() {
-		new self();
-	}
-	
 	private function getRedirectURL() { 
 		return $this->ssw->getRedirectURL();
 		
@@ -47,24 +43,25 @@ class GoogleClientWrapper {
     }
     
     public function setToken() {
-	$accessToken = $this->dao->getToken();
-	if (!$accessToken) return $this->doOAuth();
-	else {
-			$this->client->setAccessToken($accessToken);
-			if ($this->client->isAccessTokenExpired()) {
-			try {
-				$creds = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-			} catch(Exception $e) {
-				return $this->doOAuth();
+		
+		$accessToken = $this->dao->getToken();
+		if (!$accessToken) return $this->doOAuth();
+		else {
+				$this->client->setAccessToken($accessToken);
+				if ($this->client->isAccessTokenExpired()) {
+				try {
+					$creds = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+				} catch(Exception $e) {
+					return $this->doOAuth();
+				}
+				if (isset($creds['error'])) return $this->doOAuth();
 			}
-			if (isset($creds['error'])) return $this->doOAuth();
-	    }
-	}
+		}
 	
-	return true;
+		return true;
     }
     
-    public static function getOAuthCode() {
+    private static function getOAuthCode() {
 		if (!isset($_REQUEST['code'])) return false;
 		return     $_REQUEST['code'];
     }
@@ -74,8 +71,10 @@ class GoogleClientWrapper {
 	}
 	
     private function processAuthCode() {
-	if (!($code = $this->getOAuthCode())) return false;
-        $res = $this->client->authenticate($code);
+		
+		if (!($code = $this->getOAuthCode())) return false;
+        
+		$res = $this->client->authenticate($code);
 		$this->setDao();
 		$this->dao->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
@@ -86,26 +85,23 @@ class GoogleClientWrapper {
 		
 		$this->ssw->uponAuth();
 
-//		exit(0);
+		exit(0); // probably a good idea
     }
     
     public function doOAuth() {
-	$this->dao->deleteToken();
-	$this->processAuthCode();
-	$this->client->setRedirectUri($this->getRedirectURL());
-	$auth_url = $this->client->createAuthUrl();
-	$this->oauthurl = $auth_url;
+		$this->dao->deleteToken();
+		$this->processAuthCode();
+		$this->client->setRedirectUri($this->getRedirectURL());
+		$auth_url = $this->client->createAuthUrl();
+		$this->oauthurl = $auth_url;
     }
   
-	public function forceGetOAuthURL() {
-		return $this->client->createAuthUrl();	
-		
-	}
+	public function forceGetOAuthURL() { return $this->client->createAuthUrl();	}
 	
     public function getOAuthURL() {
-	if (isset  ($this->oauthurl)) 
-	     return $this->oauthurl;
-	else return false;
+		if (isset  ($this->oauthurl)) 
+			 return $this->oauthurl;
+		else return false;
     }
 
 }

@@ -17,25 +17,15 @@ class posEmailConfigForGoo extends configForGooGen {
 							'redbase' => 'receiveAuthCode.php',
 							];
 	
-	public function __construct() {
-		parent::__construct(self::peoaa);
+	public function __construct() { 
+		parent::__construct(self::peoaa); 	
 	}
 	
-	public function getRedirectURL() {
-		return $this->getBaseURL() . self::peoaa['redbase'];
-	}
-	
-	public function getURLSfx() {
-		return iaacl::getURLQ();
-	}
+	public function getRedirectURL() { return $this->getBaseURL() . self::peoaa['redbase']; }
 	
 	public function doUponAuth() {
 		isucookie::set();
 		header('Location: ' . $this->getBaseURL() . $this->getURLSfx());
 		exit(0);
 	}
-	
-//	. iaacl::getURLQ()
-	
-	// public function 
 }
