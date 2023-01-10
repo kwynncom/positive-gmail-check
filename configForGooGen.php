@@ -4,7 +4,7 @@
 require_once('configInterface.php');
 require_once('GoogleClient.php');
 
-class configForGooGen extends GoogleClientWrapper implements GooOAuthAppConfigI {
+class configForGooGen implements GooOAuthAppConfigI {
   	
 	public function getGooClientO() { }
 	
@@ -41,8 +41,11 @@ class configForGooGen extends GoogleClientWrapper implements GooOAuthAppConfigI 
 		$this->tokenInit();
     }
 	
+	public function getBaseURL    () { return $this->urlbase; }
+	
 	private function tokenInit() {
-		// $this->ggc = new GoogleClientWrapper();
+		// $wro = new GoogleClientWrapper();
+		
 	}
  
 }

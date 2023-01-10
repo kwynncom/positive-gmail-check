@@ -25,7 +25,7 @@ class posEmailConfigForGoo extends configForGooGen {
 	
 	public function doUponAuth() {
 		isucookie::set();
-		header('Location: ' . $this->getBaseURL() . $this->getURLSfx());
+		header('Location: ' . $this->getBaseURL() . iaacl::getURLQ());
 		exit(0);
 	}
 }

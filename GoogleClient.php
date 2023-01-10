@@ -83,7 +83,7 @@ class GoogleClientWrapper {
 		
 		$this->dao->putToken($accessToken);
 		
-		$this->ssw->uponAuth();
+		$this->ssw->doUponAuth();
 
 		exit(0); // probably a good idea
     }
