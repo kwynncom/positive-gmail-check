@@ -31,8 +31,8 @@ class pemsDoit {
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-		if (!isset($url) && isset($gco)) {
-			$gco = new posEmailConfigForGoo();
+		if (!isset($url)) {
+			if (!isset($gco)) $gco = new posEmailConfigForGoo();
 			$url = $gco->getOAuthURL(); 
 		}
 

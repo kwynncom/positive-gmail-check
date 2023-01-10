@@ -3,13 +3,8 @@
 require_once('dao.php');
 require_once('isUserCookie.php');
 
-class GoogleClientWrapper {
+class GooOAUTHWrapper {
 	
-	// begin from configForGooGen
-	public function getScope() { return $this->thea['scope'];	}
-	
-    public function getSecretFilePath() { return $this->specSettings['goopath']; }
-
     private function setSpecificConfig() {
 		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  $this->thea['upath'];
 		$fname = $this->thea['sfb'] . $this->thea['sfx'];
@@ -17,46 +12,24 @@ class GoogleClientWrapper {
 		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 'cannot read secret file - the input-only version');
 		$this->specSettings = $set;
     }
-	
-	public function getBaseURL    () { return $this->urlbase; }
-
-	
-	public function getRedirectURL() { 
-		return $this->getBaseURL() . $this->thea['redbase']; 
-		
-	}	
-	
-	// end configForGooGen
 
 	public function saveToken($din) {
 		$a = $this->thea;
 		$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
 		file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));		
-		
-		return;
 	}
-		function __destruct() {
+	
+	function __destruct() {
 		if (!isset($this->client)) return;
 		$this->saveToken($this->client->getAccessToken());
 	}
 
-    
-	// private function getRedirectURL() { 		return $this->ssw->getRedirectURL();	}
-
-	
-	// public function getScope() { return $this->ssw->getScope(); }
-	
-    function __construct($cdin) {
+	function __construct($cdin) {
 		
 		$this->thea = $cdin;
-		
 		$this->setSpecificConfig();
-	
-		// $this->ssw = $cono;
-		$path = $this->getSecretFilePath();
-
 		$client = new Google_Client();
-		$client->setAuthConfig($path);
+		$client->setAuthConfig( $this->specSettings['goopath']);
 		$client->setAccessType('offline');
 		$client->setIncludeGrantedScopes(true);
 		$this->client = $client;
@@ -64,9 +37,10 @@ class GoogleClientWrapper {
 		$this->processAuthCode(); 
 	
 		$this->setDao();
+		
+		$this->client->setScopes($this->thea['scope']);
+		$this->setToken();
     }
-    
-    public function setScopes($scope) { $this->client->setScopes($scope);  }
     
     public function getGoogleClient() { return $this->client; }
     
@@ -74,7 +48,7 @@ class GoogleClientWrapper {
 		$res = $this->client->revokeToken(); // returns boolean true on success
     }
     
-    public function setToken() {
+    private function setToken() {
 		
 		$accessToken = $this->dao->getToken();
 		if (!$accessToken) return $this->doOAuth();
@@ -129,7 +103,7 @@ class GoogleClientWrapper {
     public function doOAuth() {
 		$this->dao->deleteToken();
 		$this->processAuthCode();
-		$this->client->setRedirectUri($this->getRedirectURL());
+		$this->client->setRedirectUri($this->urlbase . $this->thea['redbase']);
 		$auth_url = $this->client->createAuthUrl();
 		$this->oauthurl = $auth_url;
     }
