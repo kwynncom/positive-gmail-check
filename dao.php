@@ -53,13 +53,15 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     }
     
     public function updateEmail($addr) {
-	$q2 = ['sid'  => vsid()];
-	$this->tcoll->updateOne(
-		['$and' => [['addr' => ['$eq' => $addr]],
-			   ['sids' => ['$nin' => [vsid()]]]]
-		],
-		['$push' => ['sids' => vsid()]]
-		);
+
+		$nin = ['sids' => ['$nin' => [vsid()]]];
+		$inq = ['sids' => ['$in' =>  [vsid()]]];
+		
+		// I do NOT want to upsert.
+		$this->tcoll->updateOne(['$and' => [['addr' => ['$ne' => $addr]], $inq]], ['$set'  => ['addr' => $addr ]]);
+		$this->tcoll->updateOne(['$and' => [['addr' => ['$eq' => $addr]], $nin]], ['$push' => ['sids' => vsid()]]);
+		
+
     }
     
     public function deleteTokenKwDB() {
