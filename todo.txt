@@ -1,7 +1,11 @@
+I think the logic needs to be that upon insert or update, if a row exists with a refresh key and another doesn't switch the sid to the 
+	refresh row.  
+
 remove dao reference in gmailClient, gmailClient should call $client / OAuthPosEmail object for this
 	the tokens in the database should be saved by refresh and access because that is what is unique.  
 	A session_id can't authorize more than one email without confusion, but one email ...
 	Actually, this needs more thought.  My logic doesn't seem quite right in any event.
+	An email correlates to a refresh / access token, but I don't know the address at first.
 
 plaintext emails are still going into usage
 	conditionally anonymize them based on whether it's me or not, and / or give me an alias
