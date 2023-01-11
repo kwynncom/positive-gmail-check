@@ -14,7 +14,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     }
 
 
-    public function putToken($tok) {
+    public function insertToken($tok) {
 		
 		$this->deleteTokenKwDB();
 		
@@ -23,7 +23,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 			'date'  => date('Y-m-d H:i:s'),
 			'agent' => $_SERVER['HTTP_USER_AGENT'],
 			'sids'   => [vsid()],
-			self::tfnm => $tok
+			'created_tok' => date('r', $tok['created']),
+			self::tfnm => $tok,
 		);
 
 		$this->tcoll->insertOne($dat);
@@ -49,19 +50,20 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     }
     
     public function updateToken($token) {
-		$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   ['$set' => [self::tfnm => $token]]);
+		
+		$upup = ['create_tok_re' => date('r', $token['created'])];
+		
+		$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   
+									['$set' => [self::tfnm => $token, $upup]]);
     }
     
     public function updateEmail($addr) {
 
-		$nin = ['sids' => ['$nin' => [vsid()]]];
-		$inq = ['sids' => ['$in' =>  [vsid()]]];
+			// I do NOT want to upsert.
+		$r10 = $this->tcoll->updateOne(['addr' => ['$exists' => false], 'sids' => ['$in' =>  [vsid()]]], ['$set'  => ['addr' => $addr ]]);
+		$r20 = $this->tcoll->updateOne(['addr' => ['$eq'	 => $addr], 'sids' => ['$nin' => [vsid()]]], ['$push' => ['sids' => vsid()]]);
 		
-		// I do NOT want to upsert.
-		$this->tcoll->updateOne(['$and' => [['addr' => ['$ne' => $addr]], $inq]], ['$set'  => ['addr' => $addr ]]);
-		$this->tcoll->updateOne(['$and' => [['addr' => ['$eq' => $addr]], $nin]], ['$push' => ['sids' => vsid()]]);
-		
-
+		return;
     }
     
     public function deleteTokenKwDB() {

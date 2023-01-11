@@ -1,3 +1,8 @@
+remove dao reference in gmailClient, gmailClient should call $client / OAuthPosEmail object for this
+	the tokens in the database should be saved by refresh and access because that is what is unique.  
+	A session_id can't authorize more than one email without confusion, but one email ...
+	Actually, this needs more thought.  My logic doesn't seem quite right in any event.
+
 plaintext emails are still going into usage
 	conditionally anonymize them based on whether it's me or not, and / or give me an alias
 	or give and alias feature
@@ -5,4 +10,3 @@ plaintext emails are still going into usage
 Clean up the usage table in terms of time formats and such.  Use the new library dao_generic_3
 
 Add an indicator for the user as to whether refresh token or not (exists / system has)
-

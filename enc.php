@@ -33,14 +33,14 @@ public static function expireCookies() {
 
 public function updateToken($tok) { $this->modToken($tok, 'update'); }
 
-public function putToken($tok) { $this->modToken($tok, 'insert'); }
+public function insertToken($tok) { $this->modToken($tok, 'insert'); }
 
 private function modToken($ptok, $act) {
 	$ptok['access_token' ] = $this->enc->enc($ptok['access_token' ], 'atkey');
 	if (isset(
 	$ptok['refresh_token']))
 	$ptok['refresh_token'] = $this->enc->enc($ptok['refresh_token'], 'rtkey');
-	if ($act === 'insert') parent::putToken($ptok);
+	if ($act === 'insert') parent::insertToken($ptok);
 	if ($act === 'update') parent::updateToken($ptok);
 }
 } // class

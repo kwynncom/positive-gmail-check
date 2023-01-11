@@ -25,7 +25,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 
 	public function doUponAuth($tok) {
 		isucookie::set();
-		$this->dao->putToken($tok);
+		$this->dao->insertToken($tok);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}
