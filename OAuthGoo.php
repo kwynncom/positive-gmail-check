@@ -51,14 +51,14 @@ class GooOAUTHWrapper {
 		$res = $this->client->revokeToken(); // returns boolean true on success
     }
     
-	protected function getToken() { // MUST be protected so it can be overridden.
+	protected function getSavedToken() { // MUST be protected so it can be overridden.
 		return false; 
 		
 	}
 	
     private function setToken() {
 		
-		$accessToken = $this->getToken();
+		$accessToken = $this->getSavedToken();
 		if (!$accessToken) return $this->doOAuth();
 		else {
 				$this->client->setAccessToken($accessToken);

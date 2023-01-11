@@ -1,11 +1,10 @@
 <?php
 
-require_once('dao.php');
 require_once('OAuthGoo.php');
-// require_once('configForGooGen.php');
 require_once('util.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
+require_once('gmailClient.php');
 
 class posEmailOAuth extends GooOAuthWrapper {
 
@@ -22,10 +21,16 @@ class posEmailOAuth extends GooOAuthWrapper {
 		$this->setDao();
 		parent::__construct(self::peoaa);
 	}
+	
+	public function regUsage($em) {
+		
+	}
 
 	public function doUponAuth($tok) {
 		isucookie::set();
-		$this->dao->insertToken($tok);
+		$em = false;
+		if (1) $em = gmailClient::getEmailStatic();
+		$this->dao->insertToken($tok, $em);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}
@@ -37,12 +42,11 @@ class posEmailOAuth extends GooOAuthWrapper {
 	
 	private function deleteToken() {		$this->dao->deleteTokenKwDB();			}
 	
-	protected function getToken() {
+	protected function getSavedToken() {
 		return $this->dao->getToken();	
 	}
 
 	
 	private function setDao() {	$this->dao = new dao();	}
 	
-	private function blahChild() {}
 }

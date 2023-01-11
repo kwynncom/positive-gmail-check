@@ -1,7 +1,7 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
-require_once('enc.php');
+// require_once('enc.php');
 
 require_once('OAuthPosEmail.php');
 // require_once('GoogleClient.php');
@@ -16,35 +16,42 @@ class gmailClient {
 
 		isucookie::set();
 
-		$this->dao = new dao();
-
-		$client = new posEmailOAuth();
-		$this->client = $client;
-		if (!$this->client->initTokenStatus()) $this->cannotCheck = true;
+		$gooaw = new posEmailOAuth(); // Goo OAuth wrapper
+		$this->gooaw = $gooaw;
+		if (!$this->gooaw->initTokenStatus()) $this->cannotCheck = true;
+		else $this->setUpService();
     }
+	
+	public static function getEmailStatic() {
+		$o = new self();
+		return $o->getEmail();
+	}
     
     public function getRefCount() { return count($this->refs); } 
     
-    public function getEmail() { return isset($this->email) ? $this->email : null; }
+    public function getEmail() { return kwifs($this, 'email'); }
     
-    public function check() {
+	private function setUpService() {
+		$this->serv  = $service = new Google_Service_Gmail($this->gooaw->getGoogleClient());
+		$this->email = $service->users->getProfile('me')->emailAddress;
+	}
+	
+    public function checkEmail() {
 	
 		if (isset($this->cannotCheck)) return 'oauth';
 	
-		$service = new Google_Service_Gmail($this->client->getGoogleClient());
-
-		try {	
-			$this->email = $service->users->getProfile('me')->emailAddress;
-			$this->dao->updateEmail($this->email);
-			$messagesResponse = $service->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' ));
-		} catch(Exception $exv) {
+		try { 
+			$msgso = $this->serv->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' )); 
+			$this->gooaw->regUsage($this->email);
+		} 
+		catch(Exception $exv) {
 			if ($exv->getCode() === 401) {
-			$this->client->doOAuth();
+			$this->gooaw->doOAuth();
 			return;
 			} else throw $exv;
 		}
 
-		$msgrefs = $messagesResponse->getMessages();
+		$msgrefs = $msgso->getMessages();
 
 		$this->refs = $msgrefs;
 

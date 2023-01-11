@@ -14,7 +14,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     }
 
 
-    public function insertToken($tok) {
+    protected function insertToken($tok) {
 		
 		$this->deleteTokenKwDB();
 		
@@ -40,7 +40,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	   return false;
    }
     
-    public function getToken() {
+    protected function getToken() {
 
         $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]]);
 		$t = kwifs($rest1, self::tfnm);
@@ -49,7 +49,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		else 	return false;
     }
     
-    public function updateToken($token) {
+    protected function updateToken($token) {
 		
 		$upup = ['create_tok_re' => date('r', $token['created'])];
 		

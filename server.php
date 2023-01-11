@@ -25,7 +25,7 @@ class pemsDoit {
 				dao::expireCookies();
 				kwas(false, 'revoking');
 			}
-			$ulo->putUse($gdo->check()); // *** get text / pre value of check, then check limit then check email
+			$ulo->putUse($gdo->checkEmail()); // *** get text / pre value of check, then check limit then check email
 			$msgtxt = $gdo->getText();
 			$ulo->setEmail($gdo->getEmail());
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');

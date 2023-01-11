@@ -49,14 +49,8 @@ class enc_cookies {
     
     const iv = 'K4e0pCNqBatnoNIV';
     
-    public function enc($pt, $cokey) {
-	return openssl_encrypt($pt, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv);
-    }
-    
-    public function dec($ct, $cokey) {
-	return openssl_decrypt($ct, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv);
-
-    }
+    public function enc($pt, $cokey) { return openssl_encrypt($pt, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); }
+    public function dec($ct, $cokey) { return openssl_decrypt($ct, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); }
     
     public static function getKey($cokey) {
 	if (isset($_COOKIE[$cokey])) return $_COOKIE[$cokey];
