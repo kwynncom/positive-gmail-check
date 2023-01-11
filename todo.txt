@@ -1,0 +1,8 @@
+plaintext emails are still going into usage
+	conditionally anonymize them based on whether it's me or not, and / or give me an alias
+	or give and alias feature
+
+Clean up the usage table in terms of time formats and such.  Use the new library dao_generic_3
+
+Add an indicator for the user as to whether refresh token or not (exists / system has)
+

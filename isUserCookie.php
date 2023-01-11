@@ -17,18 +17,17 @@ class isucookie {
 	}
 }
 
-// This indicates someone started the OAUTH process so they don't go back to the intro; it's not meant for hard security.  
-// My thinking was I didn't want to start a session, but a browser-session (delete on close) or short expiration seems ok.
-// This is a bit overone.
+// Lets the server.php page know that the user has already seen the intro page and wants to OAUTH.  Otherwise, the server would keep cylcing back 
+// to the intro page.  I am checking the URL with isrv().  I doubted this a moment ago.  Also, the thinking with that was that I didn't want to 
+// start sessions / cookies until they commit to using (by giving auth).
 class iaacl extends dao_generic_3 implements qemconfig {
 	
 	const timeoutS = 30;
 	const cleanDBAfterS = self::timeoutS * 1.5;
 	const codeLen  = 6;
-	const codeName = 'c';
+	const codeURLQName = 'c';
 	const Uoff = 1650866251;
 
-	
 	private function __construct() {
 		parent::__construct(self::dbname);
 		$this->creTabs('authHandoff');
@@ -63,7 +62,7 @@ class iaacl extends dao_generic_3 implements qemconfig {
 	public function getURL20I($ts, $code) {
 		$t  = '';
 		$t .= 'U=' . dechex($ts - self::Uoff);
-		$t .= '&' . self::codeName . '=' . $code;
+		$t .= '&' . self::codeURLQName . '=' . $code;
 		return $t;
 	}
 	
@@ -73,7 +72,7 @@ class iaacl extends dao_generic_3 implements qemconfig {
 		$tsi = intval($ts); unset($ts);
 		$tsi += self::Uoff;
 		kwas((abs($tsi - time()) <= self::timeoutS), 'bad URL query iaacl isUCook pemck');
-		$code = isrv(self::codeName);
+		$code = isrv(self::codeURLQName);
 		kwas(preg_match('/^[A-Za-z0-9]+$/', $code), 'invalid code format pemck iaacl 0113');
 		kwas(strlen(trim($code)) === self::codeLen, 'invalid code format 20 pemck');
 		return ['code' => $code, 'U' => $tsi];
