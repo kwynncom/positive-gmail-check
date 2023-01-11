@@ -16,7 +16,11 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
     protected function insertToken($tok, $email) {
 		
-		$this->deleteTokenKwDB();
+		$this->deleteTokenKwDB(); // probably not, actually
+		
+		// **** inserting and updating should follow the same rules / should be the same function
+		// if more recent refresh token, replace; if more recent access token, replace
+		// addr becomes unique index
 		
 		$dat = array(
 			'email'  => $email,
