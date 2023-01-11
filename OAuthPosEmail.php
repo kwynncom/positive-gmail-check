@@ -23,7 +23,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 	}
 	
 	public function regUsage($em) {
-		
+		$this->dao->updateJustUsedToken($this->client->getAccessToken(), $em);
 	}
 
 	public function doUponAuth($tok) {

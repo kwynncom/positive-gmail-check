@@ -10,7 +10,6 @@ public function __construct() {
 	parent::__construct();
 	$this->enc = new enc_cookies();
 }
-public function updateEmail($pt) { parent::updateEmail(hash('sha256', $pt)); }
 
 public function getToken() {
 	$tok  = parent::getToken();
@@ -31,17 +30,17 @@ public static function expireCookies() {
 	isucookie::unset();
 }
 
-public function updateToken($tok) { $this->modToken($tok, 'update'); }
+public function updateJustUsedToken($tok, $em) { $this->modToken($tok, 'update', $em); }
 
-public function insertToken($tok) { $this->modToken($tok, 'insert'); }
+public function insertToken($tok, $em) { $this->modToken($tok, 'insert', $em); }
 
-private function modToken($ptok, $act) {
+private function modToken($ptok, $act, $email) {
 	$ptok['access_token' ] = $this->enc->enc($ptok['access_token' ], 'atkey');
 	if (isset(
 	$ptok['refresh_token']))
 	$ptok['refresh_token'] = $this->enc->enc($ptok['refresh_token'], 'rtkey');
-	if ($act === 'insert') parent::insertToken($ptok);
-	if ($act === 'update') parent::updateToken($ptok);
+	if ($act === 'insert') parent::insertToken($ptok, $email);
+	if ($act === 'update') parent::updateToken($ptok, $email);
 }
 } // class
 

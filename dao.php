@@ -14,14 +14,12 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     }
 
 
-    protected function insertToken($tok) {
+    protected function insertToken($tok, $email) {
 		
 		$this->deleteTokenKwDB();
 		
 		$dat = array(
-			'ip'    => $_SERVER['REMOTE_ADDR'],
-			'date'  => date('Y-m-d H:i:s'),
-			'agent' => $_SERVER['HTTP_USER_AGENT'],
+			'email'  => $email,
 			'sids'   => [vsid()],
 			'created_tok' => date('r', $tok['created']),
 			self::tfnm => $tok,
@@ -49,21 +47,13 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		else 	return false;
     }
     
-    protected function updateToken($token) {
+    protected function updateToken($token, $email) {
 		
-		$upup = ['create_tok_re' => date('r', $token['created'])];
-		
-		$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   
+		if (0) { // This is where I need to make sure I'm not creating new but unnecessary / useless data
+			$upup = ['create_tok_re' => date('r', $token['created'])];
+			$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   
 									['$set' => [self::tfnm => $token, $upup]]);
-    }
-    
-    public function updateEmail($addr) {
-
-			// I do NOT want to upsert.
-		$r10 = $this->tcoll->updateOne(['addr' => ['$exists' => false], 'sids' => ['$in' =>  [vsid()]]], ['$set'  => ['addr' => $addr ]]);
-		$r20 = $this->tcoll->updateOne(['addr' => ['$eq'	 => $addr], 'sids' => ['$nin' => [vsid()]]], ['$push' => ['sids' => vsid()]]);
-		
-		return;
+		}
     }
     
     public function deleteTokenKwDB() {
