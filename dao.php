@@ -2,33 +2,31 @@
 
 require_once('configDB.php');
 
-class dao_plain implements qemconfig {
+class dao_plain extends dao_generic_3 implements qemconfig {
+	
+	const tfnm = 'gooTokenActual';
     
     function __construct() {
-    	$this->client = new MongoDB\Client();
-	$this->sessc = $this->client->selectCollection(self::dbname, 'sessions');
-	$this->tokc  = $this->client->selectCollection(self::dbname, 'gotokens');
-	
-	startSSLSession(1);
+		parent::__construct(self::dbname);
+		$this->creTabs(['t' => 'gooTokens_actual']);
+
+		startSSLSession();
     }
-    
+
+
     public function putToken($tok) {
-	$sobj = array(
-	    'ip'    => $_SERVER['REMOTE_ADDR'],
-	    'date'  => date('Y-m-d H:i:s'),
-	    'agent' => $_SERVER['HTTP_USER_AGENT'],
-	    'sid'   => vsid(),
-	    'tgtok' => $tok
-	);
 		
-	$this->sessc->updateOne(['sid' => vsid()], ['$set' => $sobj], ['upsert' => true]);
-	
-	if (isset($tok['refresh_token']))
-	    $this->tokc->updateOne(
-		    ['sid1'  => vsid()],
-		    ['$set' => ['gtok' => $tok, 'sid1' => vsid(), 'sids' => [vsid()]]],
-		    ['upsert' => true]
-	    );
+		$this->deleteTokenKwDB();
+		
+		$dat = array(
+			'ip'    => $_SERVER['REMOTE_ADDR'],
+			'date'  => date('Y-m-d H:i:s'),
+			'agent' => $_SERVER['HTTP_USER_AGENT'],
+			'sids'   => [vsid()],
+			self::tfnm => $tok
+		);
+
+		$this->tcoll->insertOne($dat);
    }
    
    private function freshOrRefresh($tin) {
@@ -43,25 +41,20 @@ class dao_plain implements qemconfig {
     
     public function getToken() {
 
-        $rest1 = $this->tokc->findOne(['sids' => ['$in' => [vsid()]]]); 
-		if ($rest1 && isset($rest1->gtok)) return $this->freshOrRefresh($rest1->gtok);
-
-
-		$ress1 = $this->sessc->findOne(['sid' => ['$eq' => vsid()]]); 
-
-		if (isset($ress1->tgtok)) return $this->freshOrRefresh($ress1->tgtok);
-		return false;
+        $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]]);
+		$t = kwifs($rest1, self::tfnm);
+		if ($t) $t = $this->freshOrRefresh($t);
+		if ($t) return $t;
+		else 	return false;
     }
     
     public function updateToken($token) {
-	$this->tokc->updateOne(['sids' => ['$in' => [vsid()]]],   ['$set' => ['gtok' => $token]]);
+		$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   ['$set' => [self::tfnm => $token]]);
     }
     
     public function updateEmail($addr) {
 	$q2 = ['sid'  => vsid()];
-	$this->tokc ->updateOne(['sid1' => vsid()],   ['$set' => ['addr' => $addr]]);
-	$this->sessc->updateOne(['sid'  => vsid()],   ['$set' => ['addr' => $addr]]);
-	$this->tokc->updateOne(
+	$this->tcoll->updateOne(
 		['$and' => [['addr' => ['$eq' => $addr]],
 			   ['sids' => ['$nin' => [vsid()]]]]
 		],
@@ -69,14 +62,26 @@ class dao_plain implements qemconfig {
 		);
     }
     
-    public function deleteToken() {
-        $this->tokc  ->deleteMany(array('sids' => array('$in' => [vsid()])), ['$unset' => ['gtok' => '']]); 
-		$this->sessc ->deleteMany(['sid'  => vsid()], ['$unset' => ['tgtok' => '']]); 
-    }
+    public function deleteTokenKwDB() {
+		
+		$qsid = ['sids' => ['$in' => [vsid()]]];
+		
+		$rs = $this->tcoll->find($qsid);
+		$addrs = [];
+		foreach($rs as $r) {
+			$addr = kwifs($r, 'addr');
+			if ($addr) $addrs[$addr] = true;
+		}
+		
+		$this->tcoll->deleteMany($qsid); 
+		
+		$a20 = array_keys($addrs);
+		$this->tcoll->deleteMany(['addr' => ['$in' => $a20]]);
+	}
 	
 	public static function deleteTokenStatic() {
 		$o = new self();
-		$o->deleteToken();
+		$o->deleteTokenKwDB();
 	}
 
 }

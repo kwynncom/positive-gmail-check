@@ -2,7 +2,7 @@
 
 require_once('dao.php');
 
-function vsid() { return hash('sha256', ptvsid()); }
+function vsid() { return hash('sha256', startSSLSession()); }
 
 class dao extends dao_plain {
 

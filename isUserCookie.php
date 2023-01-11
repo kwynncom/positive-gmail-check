@@ -17,6 +17,9 @@ class isucookie {
 	}
 }
 
+// This indicates someone started the OAUTH process so they don't go back to the intro; it's not meant for hard security.  
+// My thinking was I didn't want to start a session, but a browser-session (delete on close) or short expiration seems ok.
+// This is a bit overone.
 class iaacl extends dao_generic_3 implements qemconfig {
 	
 	const timeoutS = 30;

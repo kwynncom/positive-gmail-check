@@ -35,7 +35,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 		$res = parent::revokeToken();
     }
 	
-	private function deleteToken() {		$this->dao->deleteToken();			}
+	private function deleteToken() {		$this->dao->deleteTokenKwDB();			}
 	
 	protected function getToken() {
 		return $this->dao->getToken();	
