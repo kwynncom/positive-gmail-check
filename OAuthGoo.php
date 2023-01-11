@@ -4,11 +4,14 @@ require_once('/opt/kwynn/kwutils.php');
 
 class GooOAUTHWrapper {
 	
+	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
+	
     private function setSpecificConfig() {
 		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  $this->thea['upath'];
 		$fname = $this->thea['sfb'] . $this->thea['sfx'];
 		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
-		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 'cannot read secret file - the input-only version');
+		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 
+				'error - cannot read secret file - the input-only version', self::err_secret_file_access);
 		$this->specSettings = $set;
     }
 
