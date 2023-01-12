@@ -5,6 +5,7 @@ require_once('configDB.php');
 class dao_plain extends dao_generic_3 implements qemconfig {
 	
 	const tfnm = 'gooTokenActual';
+	const atf  = self::tfnm . '.' . 'access_token';
     
     function __construct() {
 
@@ -34,9 +35,28 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	private function creidx() {
 		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
 	}
-	
-	// private function 
 
+
+	private function upByEmail($tok, $email) {
+		
+		$euq = ['addr' => $email];
+		$eex = $this->tcoll->findOne($euq);
+		$ats = ['$addToSet' => ['sids'   => vsid()]];
+		
+		if ($eex) $uq = $euq;
+		else	  $uq = [$f => $tok['access_token']];
+		$toset = ['addr' => $email, 'addrValid' => true];
+		
+		$set = ['$set' => $toset];
+
+		$p2 = kwam($set, $ats);
+		$this->tcoll->updateOne($uq , $p2);
+		
+		$this->tcoll->deleteMany([self::atf => $tok['access_token'], 'addrValid' => false]);
+		
+		return;		
+	}
+	
     protected function updateToken($tok, $email) {
 		
 		// $this->deleteTokenKwDB(); // probably not, actually
@@ -46,33 +66,21 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		// addr becomes unique index
 		// $addToSet
 		
-		if ($email) {
-			$f = self::tfnm . '.' . 'access_token';
-			$uq = ['$or' => [[$f => $tok['access_token']], ['addr' => $email]]];			
-			$dat = ['addr' => $email, 'addrValid' => true];
-			$set = ['$set' => $dat];
-			$ats = ['$addToSet' => ['sids'   => vsid()]];
-			$p2 = kwam($set, $ats);
-			// $dat = kwam($dat, $set, $ats);
-			$this->tcoll->updateOne($uq , $p2);
+		if ($email) return $this->upByEmail($tok, $email);
+					
+		$id = dao_generic_3::get_oids();
+		$dat = [
+			'_id'  => $id,
+			'addr' => $id,
+			'addrValid' => false,
+			'created_tok' => date('r', $tok['created']),
+			self::tfnm => $tok,
+			'sids' => [vsid()],
+		];
 
-			return;
-		} else {
-		
-			$id = dao_generic_3::get_oids();
-			$dat = [
-				'_id'  => $id,
-				'addr' => $id,
-				'addrValid' => false,
-				'created_tok' => date('r', $tok['created']),
-				self::tfnm => $tok,
-				'sids' => [vsid()],
-			];
-
-			$this->dbset('drop');
-			$this->tcoll->insertOne($dat);
-		}
-   }
+		// $this->dbset('drop');
+		$this->tcoll->insertOne($dat);
+	}
    
    private function freshOrRefresh($tin) {
 	   if (isset( $tin['refresh_token'])) return (array) $tin;
