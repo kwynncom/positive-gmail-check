@@ -29,8 +29,8 @@ class posEmailOAuth extends GooOAuthWrapper {
 	public function doUponAuth($tok) {
 		isucookie::set();
 		$em = false;
+		$this->dao->insertToken($tok, $em); // !!!!!! must save token before get email AND vice versa!!!!!
 		if (1) $em = gmailClient::getEmailStatic();
-		$this->dao->insertToken($tok, $em);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}

@@ -9,27 +9,38 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     function __construct() {
 		parent::__construct(self::dbname);
 		$this->creTabs(['t' => 'gooTokens_actual']);
+		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);
 
 		startSSLSession();
     }
 
 
-    protected function insertToken($tok, $email) {
+    protected function updateToken($tok, $email) {
 		
-		$this->deleteTokenKwDB(); // probably not, actually
+		// $this->deleteTokenKwDB(); // probably not, actually
 		
 		// **** inserting and updating should follow the same rules / should be the same function
 		// if more recent refresh token, replace; if more recent access token, replace
 		// addr becomes unique index
+		// $addToSet
+		
+		$uq = ['addr' => $email];
 		
 		$dat = array(
-			'email'  => $email,
-			'sids'   => [vsid()],
 			'created_tok' => date('r', $tok['created']),
 			self::tfnm => $tok,
 		);
+		
+		$dat = kwam($uq, $dat);
 
-		$this->tcoll->insertOne($dat);
+		// 			,
+		
+		$set = ['$set' => $dat];
+		$ats = ['$addToSet' => ['sids'   => vsid()]];
+				
+		$up = kwam($set, $ats);
+		
+		$this->tcoll->updateOne($uq, $up, ['upsert' => true]);
    }
    
    private function freshOrRefresh($tin) {
@@ -51,7 +62,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		else 	return false;
     }
     
-    protected function updateToken($token, $email) {
+    protected function updateTokenolder($token, $email) {
 		
 		if (0) { // This is where I need to make sure I'm not creating new but unnecessary / useless data
 			$upup = ['create_tok_re' => date('r', $token['created'])];

@@ -39,8 +39,9 @@ private function modToken($ptok, $act, $email) {
 	if (isset(
 	$ptok['refresh_token']))
 	$ptok['refresh_token'] = $this->enc->enc($ptok['refresh_token'], 'rtkey');
-	if ($act === 'insert') parent::insertToken($ptok, $email);
-	if ($act === 'update') parent::updateToken($ptok, $email);
+	// if ($act === 'insert') parent::insertToken($ptok, $email);
+	// if ($act === 'update') 
+	parent::updateToken($ptok, $email);
 }
 } // class
 
