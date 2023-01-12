@@ -24,23 +24,31 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		// addr becomes unique index
 		// $addToSet
 		
-		$uq = ['addr' => $email];
-		
-		$dat = array(
-			'created_tok' => date('r', $tok['created']),
-			self::tfnm => $tok,
-		);
-		
-		$dat = kwam($uq, $dat);
+		if ($email) {
+			$f = self::tfnm . '.' . 'access_token';
+			$uq = ['$or' => [[$f => $tok['access_token'], ['addr' => $email]]]];			
+			$dat = ['addr' => $email, 'addrValid' => true];
+			$set = ['$set' => $dat];
+			$ats = ['$addToSet' => ['sids'   => vsid()]];
+			$p2 = kwam($set, $ats);
+			// $dat = kwam($dat, $set, $ats);
+			$this->tcoll->updateOne($uq , $p2, ['upsert' => true]);
 
-		// 			,
+			return;
+		} else {
 		
-		$set = ['$set' => $dat];
-		$ats = ['$addToSet' => ['sids'   => vsid()]];
-				
-		$up = kwam($set, $ats);
-		
-		$this->tcoll->updateOne($uq, $up, ['upsert' => true]);
+			$id = dao_generic_3::get_oids();
+			$dat = [
+				'_id'  => $id,
+				'addr' => $id,
+				'addrValid' => false,
+				'created_tok' => date('r', $tok['created']),
+				self::tfnm => $tok,
+				'sids' => [vsid()],
+			];
+
+			$this->tcoll->insertOne($dat);
+		}
    }
    
    private function freshOrRefresh($tin) {

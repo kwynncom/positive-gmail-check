@@ -15,9 +15,12 @@ public function getToken() {
 	$tok  = parent::getToken();
 	if (!$tok) return $tok;
 	$ptat = $this->enc->dec($tok['access_token'], 'atkey');
+
+	if (!$ptat) return false; // if decryption key is lost; do I need to delete stuff, too??? 
 	if (isset($tok['refresh_token'])) {
 		$ptrt = $this->enc->dec($tok['refresh_token'], 'rtkey');
 		$tok['refresh_token'] = $ptrt;	
+		if (!$ptrt) return false;
 	}
 	$tok['access_token' ] = $ptat;
 
@@ -32,7 +35,7 @@ public static function expireCookies() {
 
 public function updateJustUsedToken($tok, $em) { $this->modToken($tok, 'update', $em); }
 
-public function insertToken($tok, $em) { $this->modToken($tok, 'insert', $em); }
+public function insertToken($tok, $em = null) { $this->modToken($tok, 'insert', $em); }
 
 private function modToken($ptok, $act, $email) {
 	$ptok['access_token' ] = $this->enc->enc($ptok['access_token' ], 'atkey');

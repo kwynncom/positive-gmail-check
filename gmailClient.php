@@ -12,18 +12,19 @@ class gmailClient {
     
     private $refs = false;
     
-    function __construct() {
+    function __construct($igooaw = null) {
 
 		isucookie::set();
 
-		$gooaw = new posEmailOAuth(); // Goo OAuth wrapper
+		if (!$igooaw) $gooaw = new posEmailOAuth(); // Goo OAuth wrapper
+		else $gooaw = $igooaw;
 		$this->gooaw = $gooaw;
-		if (!$this->gooaw->initTokenStatus()) $this->cannotCheck = true;
+		if (!$igooaw && !$this->gooaw->initTokenStatus()) $this->cannotCheck = true;
 		else $this->setUpService();
     }
 	
-	public static function getEmailStatic() {
-		$o = new self();
+	public static function getEmailStatic($gooaw) {
+		$o = new self($gooaw);
 		return $o->getEmail();
 	}
     
