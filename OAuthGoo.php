@@ -26,7 +26,7 @@ class GooOAUTHWrapper {
 	
 	function __destruct() {
 		if (!isset($this->client)) return;
-		$this->saveToken($this->client->getAccessToken());
+		// **** $this->saveToken($this->client->getAccessToken()); ****
 	}
 
 	function __construct($cdin) {

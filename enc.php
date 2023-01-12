@@ -33,7 +33,9 @@ public static function expireCookies() {
 	isucookie::unset();
 }
 
-public function updateJustUsedToken($tok, $em) { $this->modToken($tok, 'update', $em); }
+public function updateJustUsedToken($tok, $em) { 
+	$this->modToken($tok, 'update', $em); 
+}
 
 public function insertToken($tok, $em = null) { $this->modToken($tok, 'insert', $em); }
 

@@ -7,13 +7,33 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	const tfnm = 'gooTokenActual';
     
     function __construct() {
-		parent::__construct(self::dbname);
-		$this->creTabs(['t' => 'gooTokens_actual']);
-		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);
+
+		$this->dbset();
 
 		startSSLSession();
     }
 
+	private function dbset($act = '') {
+		if (!$act) { 
+			parent::__construct(self::dbname);
+			$this->creTabs(['t' => 'gooTokens_actual']);
+			$this->creidx();
+		} else if ($act === 'drop') {
+			if (time() < strtotime('2023-01-11 23:15')) {
+				$this->tcoll->drop();
+				$this->creidx();
+			}
+		}
+		
+		
+		
+		
+		
+	}
+	
+	private function creidx() {
+		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
+	}
 
     protected function updateToken($tok, $email) {
 		
@@ -26,13 +46,13 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 		if ($email) {
 			$f = self::tfnm . '.' . 'access_token';
-			$uq = ['$or' => [[$f => $tok['access_token'], ['addr' => $email]]]];			
+			$uq = ['$or' => [[$f => $tok['access_token']], ['addr' => $email]]];			
 			$dat = ['addr' => $email, 'addrValid' => true];
 			$set = ['$set' => $dat];
 			$ats = ['$addToSet' => ['sids'   => vsid()]];
 			$p2 = kwam($set, $ats);
 			// $dat = kwam($dat, $set, $ats);
-			$this->tcoll->updateOne($uq , $p2, ['upsert' => true]);
+			$this->tcoll->updateOne($uq , $p2);
 
 			return;
 		} else {
@@ -47,6 +67,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 				'sids' => [vsid()],
 			];
 
+			$this->dbset('drop');
 			$this->tcoll->insertOne($dat);
 		}
    }

@@ -1,3 +1,6 @@
+next day - 2023/01/11 23:28 - What I've been doing wrong for YEARS is not realizing that getAccessToken() fetched  a new one rather than getting it 
+from memory.
+
 I think the logic needs to be that upon insert or update, if a row exists with a refresh key and another doesn't switch the sid to the 
 	refresh row.  
 
