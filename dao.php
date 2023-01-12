@@ -5,7 +5,7 @@ require_once('configDB.php');
 class dao_plain extends dao_generic_3 implements qemconfig {
 	
 	const tfnm = 'gooTokenActual';
-	const atf  = self::tfnm . '.' . 'access_token';
+	const atf  =  self::tfnm . '.' . 'access_token';
     
     function __construct() {
 
@@ -36,18 +36,25 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
 	}
 
+	private function toktoset($t) { // not overwriting refresh token
+		$a = [];
+		foreach($t as $f => $v) $a[self::tfnm . '.' . $f] = $v;
+		return $a;
+	}
 
-	private function upByEmail($tok, $email) {
+	private function upByEmail($tok, $email) { // update token itself, being careful of refresh_token
 		
 		$euq = ['addr' => $email];
 		$eex = $this->tcoll->findOne($euq);
 		$ats = ['$addToSet' => ['sids'   => vsid()]];
 		
 		if ($eex) $uq = $euq;
-		else	  $uq = [$f => $tok['access_token']];
-		$toset = ['addr' => $email, 'addrValid' => true];
+		else	  $uq = [self::atf => $tok['access_token']];
 		
-		$set = ['$set' => $toset];
+		$toset = $this->toktoset($tok);
+		if (!$eex) $toset = kwam($toset, ['addr' => $email, 'addrValid' => true]);
+		$set = [];
+		if ($toset) $set = ['$set' => $toset];
 
 		$p2 = kwam($set, $ats);
 		$this->tcoll->updateOne($uq , $p2);
