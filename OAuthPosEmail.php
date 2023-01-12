@@ -24,34 +24,24 @@ class posEmailOAuth extends GooOAuthWrapper {
 		parent::__construct(self::peoaa);
 	}
 	
-	public function regUsage($em) {
-		$this->dao->updateJustUsedToken($this->getMemTok(), $em);
+	public function regUsage($em, $mtin = false) {
+		if ($mtin) $mt = $mtin;
+		else	   $mt = $this->getMemTok();
+		$this->dao->updateJustUsedToken($mt, $em);
 	}
 
 	private function getMemTok() {
-		
-		$a10 = (array)$this->client;
-		
-		$a30 = kwifs($a10, "\x00Google\\Client\u0000token");
-		
-		exit(0);
-		$j = json_encode($a10);
-		file_put_contents('/tmp/t', $j);
-		exit(0);
-		$sz = strlen($j);
-		$a20 = json_decode($j, true);
-		
-		$a40 = $a20['Google\Clienttoken'];
-		
-		// $a = crackObject::crack($a10['Google\Clienttoken']);
-		return;
+		$a = crackObject::crackGoo($this->client);
+		$f = kwifs($a, "Google_Clienttoken");
+		return $f;
 	}
 	
-	public function doUponAuth($tok) {
+	public function doUponAuth() {
 		isucookie::set();
-		$this->dao->insertToken($tok);
+		$mt = $this->getMemTok();
+		$this->dao->insertToken($mt);
 		$em = gmailClient::getEmailStatic($this);
-		$this->regUsage($em);
+		$this->regUsage($em, $mt);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}

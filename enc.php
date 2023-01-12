@@ -53,16 +53,35 @@ private function modToken($ptok, $act, $email) {
 class enc_cookies {
     
     const iv = 'K4e0pCNqBatnoNIV';
+	
+	private function getCache( $cokey, $pt) {
+		$cached = kwifs($this, $cokey, $pt);
+		if ($cached) return $cached;
+	}
     
-    public function enc($pt, $cokey) { return openssl_encrypt($pt, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); }
-    public function dec($ct, $cokey) { return openssl_decrypt($ct, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); }
+	private function putCache($cokey, $pt, $ct) {
+		$this->$cokey[$pt] = $ct;	
+		return;
+	}
+	
+    public function enc($pt, $cokey) { 
+		if ($cct = $this->getCache($cokey, $pt)) return $cct;
+		$ct = openssl_encrypt($pt, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); 
+		$this->putCache($cokey, $pt, $ct);
+		return $ct;
+	}
+    public function dec($ct, $cokey) { 
+		$pt = openssl_decrypt($ct, 'AES-256-CBC', $this->getKey($cokey), 0, self::iv); 
+		$this->putCache($cokey, $pt, $ct);
+		return $pt;
+	}
     
     public static function getKey($cokey) {
-	if (isset($_COOKIE[$cokey])) return $_COOKIE[$cokey];
-	$cikey = self::base62();
-	kwas(isset($cikey[40]), 'key not long enough');
-	kwscookie($cokey, $cikey, isucookie::getOpts());
-	return $cikey;
+		if (isset($_COOKIE[$cokey])) return $_COOKIE[$cokey];
+		$cikey = self::base62();
+		kwas(isset($cikey[40]), 'key not long enough');
+		kwscookie($cokey, $cikey, isucookie::getOpts());
+		return $cikey;
     }
     
     private static function base62() {

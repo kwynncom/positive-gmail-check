@@ -95,8 +95,8 @@ class GooOAUTHWrapper {
 		$res = $this->client->authenticate($code);
 		$this->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
-        $accessToken = $this->client->getAccessToken();
-		$this->doUponAuth($accessToken);
+        // $accessToken = $this->client->getAccessToken();
+		$this->doUponAuth();
 
 		exit(0); // probably a good idea
     }
