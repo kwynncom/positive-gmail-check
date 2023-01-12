@@ -34,6 +34,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	private function creidx() {
 		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
 	}
+	
+	// private function 
 
     protected function updateToken($tok, $email) {
 		

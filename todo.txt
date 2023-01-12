@@ -1,5 +1,14 @@
+1/12 00:30 - It still doesn't quite work.  I need to remove the "$or" logic.  If an email matches, then erase other rows associated with the token, 
+and / or erase no-address rows that are more than a few seconds old.  
+
+First test email, then access_token.  
+
+This is causing the loop if I don't erase the db entries upon revoke.
+
+********
+
 next day - 2023/01/11 23:28 - What I've been doing wrong for YEARS is not realizing that getAccessToken() fetched  a new one rather than getting it 
-from memory.
+from memory. Update: an hour later - actually, maybe not.  It was the encryption with different keys that was part of the problem.
 
 I think the logic needs to be that upon insert or update, if a row exists with a refresh key and another doesn't switch the sid to the 
 	refresh row.  
