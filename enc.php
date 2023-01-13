@@ -33,26 +33,25 @@ public static function expireCookies() {
 	isucookie::unset();
 }
 
-public function updateJustUsedToken($tok, $em) { 
-	$this->modToken($tok, 'update', $em); 
-}
-
-public function insertToken($tok, $em = null) { $this->modToken($tok, 'insert', $em); }
-
-private function modToken($ptok, $act, $email) {
+public function upsertToken($ptok, $email = null) {
 	$ptok['access_token' ] = $this->enc->enc($ptok['access_token' ], 'atkey');
-	if (isset(
-	$ptok['refresh_token']))
-	$ptok['refresh_token'] = $this->enc->enc($ptok['refresh_token'], 'rtkey');
-	// if ($act === 'insert') parent::insertToken($ptok, $email);
-	// if ($act === 'update') 
-	parent::updateToken($ptok, $email);
+	if ($rt = kwifs($ptok, 'refresh_token'))
+		$ptok['refresh_token'] = $this->enc->enc($rt, 'rtkey'); unset($rt);
+		
+	$emh = $this->enc->emailHash($email); unset($email);
+	parent::upsertToken($ptok, $emh);
 }
 } // class
 
 class enc_cookies {
     
     const iv = 'K4e0pCNqBatnoNIV';
+	
+	public function emailHash($em) {
+		if (!$em) return $em;
+		static $o = ['memory_cost' => 8 * 1024, 'time_cost' => 3, 'threads' => 2]; // about 0.02s on AWS t3a.micro
+		return password_hash ($em, PASSWORD_ARGON2ID, $o); unset($em);
+	}
 	
 	private function getCache( $cokey, $pt) {
 		$cached = kwifs($this, $cokey, $pt);

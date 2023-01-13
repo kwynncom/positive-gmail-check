@@ -27,7 +27,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 	public function regUsage($em, $mtin = false) {
 		if ($mtin) $mt = $mtin;
 		else	   $mt = $this->getMemTok();
-		$this->dao->updateJustUsedToken($mt, $em);
+		$this->dao->upsertToken($mt, $em);
 	}
 
 	private function getMemTok() {
@@ -39,7 +39,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 	public function doUponAuth() {
 		isucookie::set();
 		$mt = $this->getMemTok();
-		$this->dao->insertToken($mt);
+		$this->dao->upsertToken($mt);
 		$em = gmailClient::getEmailStatic($this);
 		$this->regUsage($em, $mt);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());

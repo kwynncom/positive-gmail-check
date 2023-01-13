@@ -64,15 +64,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		return;		
 	}
 	
-    protected function updateToken($tok, $email) {
-		
-		// $this->deleteTokenKwDB(); // probably not, actually
-		
-		// **** inserting and updating should follow the same rules / should be the same function
-		// if more recent refresh token, replace; if more recent access token, replace
-		// addr becomes unique index
-		// $addToSet
-		
+    protected function upsertToken($tok, $email) {
+	
 		if ($email) return $this->upByEmail($tok, $email);
 					
 		$id = dao_generic_3::get_oids();
