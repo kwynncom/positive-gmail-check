@@ -48,7 +48,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 		$atk = [self::atf => $tok['access_token']];
 		$rtv = kwifs($tok, 'refresh_token');
-		if ($rtv) {
+		if ($rtv) { // This is the encrypted form, so it will be specific to keys the client can decrypt
 			$uq = ['$or' => [$atk, 'refresh_token' => $rtv]];
 		} else $uq = $atk;
 		
@@ -95,20 +95,11 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     
     protected function getToken() {
 
-        $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]]);
+        $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]], ['sort' => ['gooTokenActual.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
 		if ($t) $t = $this->freshOrRefresh($t);
 		if ($t) return $t;
 		else 	return false;
-    }
-    
-    protected function updateTokenolder($token, $email) {
-		
-		if (0) { // This is where I need to make sure I'm not creating new but unnecessary / useless data
-			$upup = ['create_tok_re' => date('r', $token['created'])];
-			$this->tcoll->updateOne(['sids' => ['$in' => [vsid()]]],   
-									['$set' => [self::tfnm => $token, $upup]]);
-		}
     }
     
     public function deleteTokenKwDB() {

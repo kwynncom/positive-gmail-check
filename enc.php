@@ -52,10 +52,10 @@ class enc_cookies {
     
     const iv = 'K4e0pCNqBatnoNIV';
 	
-	public function emailHash($em) {
-		if (!$em) return $em;
-		static $o = ['memory_cost' => 8 * 1024, 'time_cost' => 3, 'threads' => 2]; // about 0.02s on AWS t3a.micro
-		return password_hash ($em, PASSWORD_ARGON2ID, $o); unset($em);
+	public function emailHash($t) {
+		if (!$t) return false;
+		for ($i=0; $i < 2806; $i++) $t = crypt($t, 'apIpUIgaIsuu5y3kqiAXVBdiTGclx2');
+		return $t;
 	}
 	
 	private function getCache( $cokey, $pt) {
