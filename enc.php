@@ -6,18 +6,23 @@ function vsid() { return hash('sha256', startSSLSession()); }
 
 class dao extends dao_plain {
 
-public function __construct() {
+public function __construct($logo) {
+	$this->log = $logo;
 	parent::__construct();
 	$this->enc = new enc_cookies();
 }
 
 public function getToken() {
 	$tok  = parent::getToken();
-	if (!$tok) return $tok;
+	if (!$tok) return false;
 	$ptat = $this->enc->dec($tok['access_token'], 'atkey');
 
-	if (!$ptat) return false; // if decryption key is lost; do I need to delete stuff, too??? 
+	if (!$ptat) {
+		$this->log->log('no at db');
+		return false; // if decryption key is lost; do I need to delete stuff, too??? 
+	}
 	if (isset($tok['refresh_token'])) {
+		$this->log->log('yes rt db');
 		$ptrt = $this->enc->dec($tok['refresh_token'], 'rtkey');
 		$tok['refresh_token'] = $ptrt;	
 		if (!$ptrt) return false;
@@ -84,15 +89,7 @@ class enc_cookies {
     }
     
     private static function base62() {
-    
-	$len = random_int(45, 50);
-
-	$basea = [ord('A'), ord('a'), ord('0')];
-
-	for ($i=0, $rs = ''; $i < $len; $i++)
-	   for ($j=0, $ri = random_int(0, 61); $j < 62; $j++, $ri -= 26)
-		if ($ri < 26) { $rs .= chr($basea[$j] + $ri); break; }
-
-	return $rs;
+		$len = random_int(45, 50);
+		return base62::get($len);
     }
 }

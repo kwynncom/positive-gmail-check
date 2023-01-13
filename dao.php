@@ -33,7 +33,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	}
 	
 	private function creidx() {
-		$this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
+		// $this->tcoll->createIndex(['addr' => -1], ['unique' => true]);		
 	}
 
 	private function toktoset($t) { // not overwriting refresh token
@@ -44,15 +44,16 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
 	private function upByEmail($tok, $email) { // update token itself, being careful of refresh_token
 		
-		$euq = ['addr' => $email];
-		$eex = $this->tcoll->findOne($euq);
 		$ats = ['$addToSet' => ['sids'   => vsid()]];
 		
-		if ($eex) $uq = $euq;
-		else	  $uq = [self::atf => $tok['access_token']];
+		$atk = [self::atf => $tok['access_token']];
+		$rtv = kwifs($tok, 'refresh_token');
+		if ($rtv) {
+			$uq = ['$or' => [$atk, 'refresh_token' => $rtv]];
+		} else $uq = $atk;
 		
 		$toset = $this->toktoset($tok);
-		if (!$eex) $toset = kwam($toset, ['addr' => $email, 'addrValid' => true]);
+		if ($email) $toset = kwam($toset, ['addr' => $email, 'addrValid' => true]);
 		$set = [];
 		if ($toset) $set = ['$set' => $toset];
 

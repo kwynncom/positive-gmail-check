@@ -36,6 +36,7 @@ class pemsDoit {
 			$url = $gco->getOAuthURL(); 
 		}
 
+		if (isset($gco)) $log = $gco->getLog();
 		unset($gdo, $gco);
 		
 		$now   = time();

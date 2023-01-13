@@ -1,6 +1,7 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
+require_once('log.php');
 
 class GooOAUTHWrapper {
 	
@@ -31,6 +32,8 @@ class GooOAUTHWrapper {
 
 	function __construct($cdin) {
 		
+		$this->logs = '';
+		
 		$this->thea = $cdin;
 		$this->setSpecificConfig();
 		$client = new Google_Client();
@@ -40,35 +43,45 @@ class GooOAUTHWrapper {
 		$this->client = $client;
 
 		$this->processAuthCode(); 
-		
 		$this->client->setScopes($this->thea['scope']);
 		$this->setToken();
     }
     
     public function getGoogleClient() { return $this->client; }
     
-    public function revokeToken() {
-		$res = $this->client->revokeToken(); // returns boolean true on success
-    }
+    public function revokeToken() {	$this->client->revokeToken(); /* returns boolean true on success */    }
     
-	protected function getSavedToken() { // MUST be protected so it can be overridden.
-		return false; 
-		
+	protected function getSavedToken() { return false; }
+	
+	private function logdbr($t) {
+		if		(isset($t['refresh_token'])) $this->log('rt in db');
+		else if (isset($t['access_token' ])) $this->log('at in db');
 	}
 	
     private function setToken() {
 		
 		$accessToken = $this->getSavedToken();
-		if (!$accessToken) return $this->doOAuth();
+		if (!$accessToken) {
+			$this->log('no tok db');
+			return $this->doOAuth();
+		}
 		else {
+				$this->logdbr($accessToken);
 				$this->client->setAccessToken($accessToken);
 				if ($this->client->isAccessTokenExpired()) {
-				try {
+				try { 
+					$this->log('refresh attempt');
 					$creds = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-				} catch(Exception $e) {
+					$this->log('refresh OK');
+				} catch(Exception $e)	{ 
+					$this->log('refresh exception');
+					return $this->doOAuth(); 
+				}
+				if (isset($creds['error'])) {
+					$this->log('refresh ob err');
 					return $this->doOAuth();
 				}
-				if (isset($creds['error'])) return $this->doOAuth();
+				
 			}
 		}
 	
@@ -88,17 +101,22 @@ class GooOAUTHWrapper {
     
 	private function deleteToken() {}
 	
+	private function log($sin) {
+		$this->log->log($sin);
+	}
+
     private function processAuthCode() {
 		
 		if (!($code = $this->getOAuthCode())) return false;
+		
+		$this->log('nonce code');
         
 		$res = $this->client->authenticate($code);
 		$this->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
-        // $accessToken = $this->client->getAccessToken();
 		$this->doUponAuth();
 
-		exit(0); // probably a good idea
+		exit(0); // maybe a good idea
     }
     
     public function doOAuth() {

@@ -19,10 +19,15 @@ class posEmailOAuth extends GooOAuthWrapper {
 							'redbase' => 'receiveAuthCode.php',
 							];
 	
+	protected $log;
+	
 	public function __construct() { 
+		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
 	}
+	
+	public function getLog() { return $this->log->get(); }
 	
 	public function regUsage($em, $mtin = false) {
 		if ($mtin) $mt = $mtin;
@@ -32,7 +37,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 
 	private function getMemTok() {
 		$a = crackObject::crackGoo($this->client);
-		$f = kwifs($a, "Google_Clienttoken");
+		$f = kwifs($a, 'Google_Clienttoken');
 		return $f;
 	}
 	
@@ -48,16 +53,11 @@ class posEmailOAuth extends GooOAuthWrapper {
 	
 	public function revokeToken() {
 		$this->deleteToken();
-		$res = parent::revokeToken();
+		parent::revokeToken();
     }
 	
-	private function deleteToken() {		$this->dao->deleteTokenKwDB();			}
-	
-	protected function getSavedToken() {
-		return $this->dao->getToken();	
-	}
-
-	
-	private function setDao() {	$this->dao = new dao();	}
+	private	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
+	protected function getSavedToken() { return $this->dao->getToken();	}
+	private   function setDao()		   { $this->dao = new dao($this->log);		}
 	
 }
