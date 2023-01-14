@@ -72,6 +72,8 @@ class enc_cookies {
 	}
 	
 	public function getekida() { 
+		$ids = [];
+		
 		foreach($this->oos as $k => $v) {
 			unset($v[self::eknm]);
 			$ids[$k] = $v;
@@ -83,8 +85,11 @@ class enc_cookies {
 	}
 	
 	public function dec($dbo) { 
-		if ($raw = $this->rawGooTokO) return $raw; unset($raw);
-		// $this->loadCookie();
+		if ($raw = $this->rawGooTokO) {
+			return $raw; 
+		}
+
+		unset($raw);
 		
 		$pto = $dbo; unset($dbo);
 		foreach(self::goofs as $f) {
@@ -115,28 +120,32 @@ class enc_cookies {
 			$dk = kwifs($this->oos, $f . self::obsfx, self::eknm); 
 			if (!$dk) {
 				$this->setKeyOb($f);
-				$dk = kwifs($this->oos, $f . self::obsfx, self::eknn); 
+				$dk = kwifs($this->oos, $f . self::obsfx, self::eknm); 
 			}
 			
 			kwas($dk, 'no enc key cook enc');
-			$etok[$f] = $this->oos [$f . self::obsfx] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
+			$this->oos [$f . self::obsfx][$this->goonm] = $ptok;
+			$etok[$f] = $this->oos [$f . self::obsfx][$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 			unset($ptok[$f]);
 			$ra[$f][$this->goonm] = $etok;
 			break; // if refresh token exists, no need for access token
 			
 		}
 		
-		return $ra;
+		return $this->getoosWOKey();
 	}
     
-    private function getKey		($gobnm) {
-		if ($k = $this->getEKeyO($gobnm)) return $k;
-		self::getNewKeyO($coname);
-		return $cikey;
-    }
-	
-
-    
+	private function getoosWOKey() { 
+		$o20 = $this->oos;
+		foreach($o20 as $nm => $a) {
+			$key = kwifs($o20, $nm, self::eknm); 	kwas($key, 'confirming key so I can delete it - failed');
+			unset       ($o20 [$nm][self::eknm], $key);
+			$key = kwifs($o20, self::eknm); 
+			kwas(!$key, 'confirm gone failed');
+		}
+		return $o20;
+	}
+  
 	private function setKeyOb($gobnm) {
 		$tek = self::base62();
 		$a = [];

@@ -82,8 +82,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 			];
 
 			$dat = kwam($dat20, $trwo);
-
-			$this->tcoll->insertOne($dat);
+						
+			$this->tcoll->upsert(['_id' => $trwo['_id']], $dat);
 		}
 	}
    
