@@ -12,6 +12,10 @@ public function __construct($logo) {
 	$this->cob = new enc_cookies(self::tfnm);
 }
 
+public function deleteTokenKwDB($ignore = null) {
+	parent::deleteTokenKwDB($this->cob->getekida());
+}
+
 public function getTokenDB() {
 	
 	$etok  = parent::getTokenDBO($this->cob->getekida());
@@ -136,10 +140,15 @@ class enc_cookies {
 		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
 
 		$this->oos = $a;
-		$j = json_encode($a);
-		kwscookie(self::conm, $j, isucookie::getOpts());	
-
+		$this->renewCookie();
+	}
+	
+	private function renewCookie() {
+		$a = [];
 		
+		foreach([self::eknm, 'r_cookie', '_id', 'rid'] as $f) $a[$f] = $this->oos[$f];
+		$j = json_encode($a);
+		kwscookie(self::conm, $j, isucookie::getOpts());		
 	}
 	
 	private static function putKeyO() {
@@ -153,6 +162,8 @@ class enc_cookies {
 
 	public function emailHash($t) {
 		if (!$t) return false;
+		$this->renewCookie();
+		isucookie::set();
 		for ($i=0; $i < 2806; $i++) $t = crypt($t, 'apIpUIgaIsuu5y3kqiAXVBdiTGclx2');
 		return $t;
 	}

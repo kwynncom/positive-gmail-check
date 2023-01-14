@@ -1,17 +1,10 @@
 <?php
 
-require_once('/opt/kwynn/kwutils.php');
 require_once('OAuthPosEmail.php');
-require_once('usageLimit/usageLimit.php');
-require_once('isUserCookie.php');
 
 class gmailClient {
     
-    private $refs = false;
-    
     function __construct($igooaw = null) {
-
-		isucookie::set();
 
 		if (!$igooaw) $gooaw = new posEmailOAuth(); // Goo OAuth wrapper
 		else $gooaw = $igooaw;
@@ -25,8 +18,6 @@ class gmailClient {
 		return $o->getEmail();
 	}
     
-    public function getRefCount() { return count($this->refs); } 
-    
     public function getEmail() { return kwifs($this, 'email'); }
     
 	private function setUpService() {
@@ -39,7 +30,7 @@ class gmailClient {
 		if (isset($this->cannotCheck)) return 'oauth';
 	
 		try { 
-			$msgso = $this->serv->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' )); 
+			$this->goomlo = $goomlo = $this->serv->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' )); 
 			$this->gooaw->regUsage($this->email);
 		} 
 		catch(Exception $exv) {
@@ -49,19 +40,17 @@ class gmailClient {
 			} else throw $exv;
 		}
 
-		$msgrefs = $msgso->getMessages();
-
-		$this->refs = $msgrefs;
-
 		return 'checked';
     }
     
     public function getText() {
 	
-		$msgRefs = isset($this->refs) ? $this->refs : '';
-		if (!$msgRefs && !is_array($msgRefs)) return 'msg error';
-		else if (is_array($msgRefs)) return count($msgRefs);
-		else return 'nock';
-    }
+		$ro = kwifs($this, 'goomlo');
+		$mo = $ro->getMessages();
+		if (is_array($mo)) return count($mo);
+		if (!$mo && $ro->getResultSizeEstimate() === 0) return 0;
+		if (!$ro) return 'nock';
+		return 'GooMR error';
+	}
    
 } // end class

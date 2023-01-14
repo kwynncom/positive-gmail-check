@@ -116,21 +116,10 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		return false;
     }
     
-    public function deleteTokenKwDB() {
+    protected function deleteTokenKwDB($a) {
 		
-		$qsid = ['sids' => ['$in' => [vsid()]]];
-		
-		$rs = $this->tcoll->find($qsid);
-		$addrs = [];
-		foreach($rs as $r) {
-			$addr = kwifs($r, 'addr');
-			if ($addr) $addrs[$addr] = true;
-		}
-		
-		$this->tcoll->deleteMany($qsid); 
-		
-		$a20 = array_keys($addrs);
-		$this->tcoll->deleteMany(['addr' => ['$in' => $a20]]);
+		$r = $this->tcoll->deleteOne(['_id' => $a['_id']]);
+		return;
 	}
 	
 	public static function deleteTokenStatic() {

@@ -14,7 +14,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 	public static function revokeAccess() {
 		$o = new self();
 		$o->revokeToken();
-		dao_plain::deleteTokenStatic();
+		$o->deleteToken();
 		dao::expireCookies();
 		return $o->urlbase;
 	}
@@ -61,11 +61,12 @@ class posEmailOAuth extends GooOAuthWrapper {
 	}
 	
 	public function revokeToken() {
+		$rr = parent::revokeToken();
 		$this->deleteToken();
-		parent::revokeToken();
+		return;
     }
 	
-	private	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
+	public	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
 	protected function getSavedToken() { return $this->dao->getTokenDB();	}
 	private   function setDao()		   { $this->dao = new dao($this->log);		}
 	

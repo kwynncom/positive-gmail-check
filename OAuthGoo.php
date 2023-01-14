@@ -53,7 +53,8 @@ class GooOAUTHWrapper {
     
     public function getGoogleClient() { return $this->client; }
     
-    public function revokeToken() {	$this->client->revokeToken(); /* returns boolean true on success */    }
+    public function revokeToken() {	
+		return $this->client->revokeToken(); /* returns boolean true on success */    }
     
 	protected function getSavedToken() { return false; }
 	
