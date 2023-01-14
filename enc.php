@@ -14,8 +14,6 @@ public function __construct($logo) {
 
 public function getTokenDB() {
 	
-	// return false; // ******
-	
 	$etok  = parent::getTokenDBO($this->cob->getekida());
 	if (!$etok) return false;
 	$dtok = $this->cob->dec($etok);
@@ -60,10 +58,13 @@ class enc_cookies {
 	}
 
 	private function loadCookies() {
+		
+		$this->dbids = [];
+		
 		foreach(self::goofs as $f) {
 			
 			$j = kwifs($_COOKIE, $f . self::obsfx);
-			if (!$j) return;
+			if (!$j) continue;
 			$a = [];
 			if ($j) $a = json_decode($j, true);
 			$this->oos[$f . self::obsfx] = $a;
@@ -73,18 +74,9 @@ class enc_cookies {
 		return $this->dbids;
 	}
 	
-	public function getekida() {
+	public function getekida() { 
+		return $this->dbids; 
 		
-		$ra = [];
-		
-		if (!isset($this->oos)) $this->oos = [];
-		
-		foreach(self::goofs as $fk => $f) {
-			$ta = $this->getEKeyO($f);
-			$this->oos[$f . self::obsfx] = $ta;
-		}
-		
-		return $ra;
 	}
 	
 	public function dec($dbo) { 
@@ -96,7 +88,11 @@ class enc_cookies {
 			if (!isset($pto[$f])) continue;
 			$sfx =  $f . self::obsfx;
 			$dk = kwifs($this->oos, $sfx, $f);
-			if ($dk)	$this->oos[$sfx][$f] = $pto[$f] = openssl_decrypt($ct, 'AES-256-CBC', $dk, 0, self::iniv);
+			if ($dk) {
+				 $tdc = openssl_decrypt($ct, 'AES-256-CBC', $dk, 0, self::iniv);
+				 if ($tdc) $this->oos[$sfx][$f] = $pto[$f] = $tdc;
+				 else unset($pto[$f]);
+			}
 			else unset($pto[$f]);
 			
 		}
