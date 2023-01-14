@@ -5,16 +5,16 @@ require_once('dao.php');
 function vsid() { return hash('sha256', startSSLSession()); }
 
 class dao extends dao_plain {
-
+	
 public function __construct($logo) {
 	$this->log = $logo;
 	parent::__construct();
-	$this->cob = new enc_cookies();
+	$this->cob = new enc_cookies(self::tfnm);
 }
 
 public function getTokenDB() {
 	
-	return false; // ******
+	// return false; // ******
 	
 	$etok  = parent::getTokenDBO($this->cob->getekida());
 	if (!$etok) return false;
@@ -50,11 +50,12 @@ class enc_cookies {
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const goofs  = GooOAUTHWrapper::tnms;
 	const obsfx  = '_ob';
-	const dbidfs = ['_id', 'r', 'rid', 'enkey', 'tokty'];
+	const dbidfs = ['_id', 'r_cookie', 'rid', 'tokty'];
 	
-	public function __construct() {
+	public function __construct($goonm) {
 		$this->oos = [];
 		$this->rawGooTokO = [];
+		$this->goonm = $goonm;
 		$this->loadCookies();
 	}
 
@@ -107,6 +108,7 @@ class enc_cookies {
 		
 		$this->rawGooTokO = $ptok;
 	
+		$ra = [];
 		$etok = $ptok;
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
@@ -114,12 +116,11 @@ class enc_cookies {
 			$etok[$f] = $this->oos [$f . self::obsfx] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 			unset($ptok[$f]);
 			$this->setKeyOb($f);
+			$ra[$f] = $this->dbids[$f];
+			$ra[$f][$this->goonm] = $etok;
 			break; // if refresh token exists, no need for access token
 			
 		}
-		
-		$ra = $this->dbids;
-		$ra['goo_enc'] = $etok;
 		
 		return $ra;
 	}
@@ -137,7 +138,7 @@ class enc_cookies {
 		$a = [];
 		$a['enkey'] = $tek;
 		$a['tokty'] = $gobnm;
-		$a['r'] = date('r');
+		$a['r_cookie'] = date('r');
 		$a['_id'] = dao_generic_3::get_oids();
 		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
 		$obsfx = $gobnm . self::obsfx;

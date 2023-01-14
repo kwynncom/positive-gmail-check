@@ -4,7 +4,7 @@ require_once('configDB.php');
 
 class dao_plain extends dao_generic_3 implements qemconfig {
 	
-	const tfnm = 'gooTokenActual';
+	const tfnm = 'gooTokEncDB';
 	const atf  =  self::tfnm . '.' . 'access_token';
     
     function __construct() {
@@ -44,7 +44,9 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
 	private function upByEmail($tok, $email) { // update token itself, being careful of refresh_token
 		
-		$ats = ['$addToSet' => ['sids'   => vsid()]];
+		$ats = [];
+		// $ats = ['$addToSet' => ['sids'   => vsid()]];
+		
 		
 		$atk = [self::atf => $tok['access_token']];
 		$rtv = kwifs($tok, 'refresh_token');
@@ -65,22 +67,25 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		return;		
 	}
 	
-    protected function upsertToken($tok, $email) {
-	
-		if ($email) return $this->upByEmail($tok, $email);
-					
-		$id = dao_generic_3::get_oids();
-		$dat = [
-			'_id'  => $id,
-			'addr' => $id,
-			'addrValid' => false,
-			'created_tok' => date('r', $tok['created']),
-			self::tfnm => $tok,
-			'sids' => [vsid()],
-		];
+    protected function upsertToken($trwo2, $email) {
+		
+		foreach($trwo2 as $ty => $trwo) {
+		
+			$goo = $trwo[self::tfnm];
 
-		// $this->dbset('drop');
-		$this->tcoll->insertOne($dat);
+			if ($email) return $this->upByEmail($goo, $email);
+
+			$dat20 = [
+				'addr' => $trwo['_id'],
+				'addrValid' => false,
+				'created_tok' => date('r', $goo['created']),
+				// 'sids' => [vsid()],
+			];
+
+			$dat = kwam($dat20, $trwo);
+
+			$this->tcoll->insertOne($dat);
+		}
 	}
    
    private function freshOrRefresh($tin) {
