@@ -66,25 +66,23 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 		return;		
 	} 	*/
-    protected function upsertToken($trwo2, $email) {
+    protected function upsertToken($trwo, $email) {
 		
-		foreach($trwo2 as $ty => $trwo) {
-		
-			$goo = $trwo[self::tfnm];
+		$goo = $trwo[self::tfnm];
 
-			// if ($email) $this->upByEmail($goo, $email);
+		// if ($email) $this->upByEmail($goo, $email);
 
-			$dat20 = [
-				'addr' => $email ? $email : $trwo['_id'],
-				'addrValid' => false,
-				'created_tok' => date('r', $goo['created']),
-				// 'sids' => [vsid()],
-			];
+		$dat20 = [
+			'addr' => $email ? $email : $trwo['_id'],
+			'addrValid' => false,
+			'created_tok' => date('r', $goo['created']),
+			// 'sids' => [vsid()],
+		];
 
-			$dat = kwam($dat20, $trwo);
-						
-			$this->tcoll->upsert(['_id' => $trwo['_id']], $dat);
-		}
+		$dat = kwam($dat20, $trwo);
+
+		$this->tcoll->upsert(['_id' => $trwo['_id']], $dat);
+
 	}
    
 
@@ -105,13 +103,13 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
    }
    
-    protected function getTokenDBO($idos) {
+    protected function getTokenDBO($ido) {
 
-		foreach($idos as $ido) {
-			$rest1 = $this->tcoll->findOne(['_id' => $ido['_id']], ['sort' => [self::tfnm . '.created' => -1]]);
-			$t = kwifs($rest1, self::tfnm);
-			if ($this->freshOrCanRefresh($t)) return $t;
-		}
+
+		$rest1 = $this->tcoll->findOne(['_id' => $ido['_id']], ['sort' => [self::tfnm . '.created' => -1]]);
+		$t = kwifs($rest1, self::tfnm);
+		if ($this->freshOrCanRefresh($t)) return $t;
+
 		return false;
     }
     
