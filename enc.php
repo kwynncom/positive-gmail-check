@@ -128,8 +128,7 @@ class enc_cookies {
 			$etok[$f] = $this->oos [$f . self::obsfx][$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 			unset($ptok[$f]);
 			$ra[$f][$this->goonm] = $etok;
-			break; // if refresh token exists, no need for access token
-			
+		
 		}
 		
 		return $this->getoosWOKey();
