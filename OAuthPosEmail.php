@@ -57,7 +57,7 @@ class posEmailOAuth extends GooOAuthWrapper {
     }
 	
 	private	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
-	protected function getSavedToken() { return $this->dao->getToken();	}
+	protected function getSavedToken() { return $this->dao->getTokenDB();	}
 	private   function setDao()		   { $this->dao = new dao($this->log);		}
 	
 }

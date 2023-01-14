@@ -93,7 +93,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	   return false;
    }
     
-    protected function getToken() {
+    protected function getTokenDBO() {
 
         $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]], ['sort' => ['gooTokenActual.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);

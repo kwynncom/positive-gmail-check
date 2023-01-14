@@ -8,7 +8,8 @@ class GooOAUTHWrapper {
 	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
 	
     private function setSpecificConfig() {
-		$this->urlbase = $oarurl = 'https://' . $_SERVER['SERVER_NAME'] .  $this->thea['upath'];
+		if (!($sn = kwifs($_SERVER, 'SERVER_NAME'))) $sn = 'example.com';
+		$this->urlbase = $oarurl = 'https://' .		 $sn .  $this->thea['upath'];
 		$fname = $this->thea['sfb'] . $this->thea['sfx'];
 		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
 		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 
