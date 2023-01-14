@@ -48,7 +48,7 @@ class enc_cookies {
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const goofs  = GooOAUTHWrapper::tnms;
 	const obsfx  = '_ob';
-	const dbidfs = ['_id', 'r_cookie', 'rid', 'tokty'];
+	const eknm = 'enkey';
 	
 	public function __construct($goonm) {
 		$this->oos = [];
@@ -59,8 +59,6 @@ class enc_cookies {
 
 	private function loadCookies() {
 		
-		$this->dbids = [];
-		
 		foreach(self::goofs as $f) {
 			
 			$j = kwifs($_COOKIE, $f . self::obsfx);
@@ -68,14 +66,19 @@ class enc_cookies {
 			$a = [];
 			if ($j) $a = json_decode($j, true);
 			$this->oos[$f . self::obsfx] = $a;
-			foreach(self::dbidfs as $df)  $this->dbids[$f][$df] = $a[$df];
 		}
 		
-		return $this->dbids;
+		return $this->getekida();
 	}
 	
 	public function getekida() { 
-		return $this->dbids; 
+		foreach($this->oos as $k => $v) {
+			unset($v[self::eknm]);
+			$ids[$k] = $v;
+			
+		}
+		
+		return $ids;
 		
 	}
 	
@@ -87,7 +90,7 @@ class enc_cookies {
 		foreach(self::goofs as $f) {
 			if (!isset($pto[$f])) continue;
 			$sfx =  $f . self::obsfx;
-			$dk = kwifs($this->oos, $sfx, 'enkey');
+			$dk = kwifs($this->oos, $sfx, self::eknm);
 			if ($dk) {
 				 $tdc = openssl_decrypt($pto[$f], 'AES-256-CBC', $dk, 0, self::iniv);
 				 if ($tdc) $this->oos[$sfx][$f] = $pto[$f] = $tdc;
@@ -108,11 +111,16 @@ class enc_cookies {
 		$etok = $ptok;
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			$this->setKeyOb($f); // *** must move this
-			$dk = kwifs($this->oos, $f . self::obsfx, 'enkey'); kwas($dk, 'no enc key cook enc');
+			 
+			$dk = kwifs($this->oos, $f . self::obsfx, self::eknm); 
+			if (!$dk) {
+				$this->setKeyOb($f);
+				$dk = kwifs($this->oos, $f . self::obsfx, self::eknn); 
+			}
+			
+			kwas($dk, 'no enc key cook enc');
 			$etok[$f] = $this->oos [$f . self::obsfx] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 			unset($ptok[$f]);
-			$ra[$f] = $this->dbids[$f];
 			$ra[$f][$this->goonm] = $etok;
 			break; // if refresh token exists, no need for access token
 			
@@ -132,16 +140,17 @@ class enc_cookies {
 	private function setKeyOb($gobnm) {
 		$tek = self::base62();
 		$a = [];
-		$a['enkey'] = $tek;
+		$a[self::eknm] = $tek;
 		$a['tokty'] = $gobnm;
 		$a['r_cookie'] = date('r');
 		$a['_id'] = dao_generic_3::get_oids();
 		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
 		$obsfx = $gobnm . self::obsfx;
 		$this->oos[$obsfx] = $a;
-		foreach(self::dbidfs as $df)  $this->dbids[$gobnm][$df] = $a[$df];
 		$j = json_encode($a);
 		kwscookie($obsfx, $j, isucookie::getOpts());	
+
+		
 	}
 	
 	private static function putKeyO() {
