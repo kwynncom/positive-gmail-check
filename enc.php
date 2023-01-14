@@ -52,7 +52,6 @@ class enc_cookies {
 	
 	public function __construct($goonm) {
 		$this->oos = [];
-		$this->rawGooTokO = [];
 		$this->goonm = $goonm;
 		$this->loadCookies();
 	}
@@ -80,11 +79,6 @@ class enc_cookies {
 	}
 	
 	public function dec($dbo) { 
-		if ($raw = $this->rawGooTokO) { // ???
-			return $raw; 
-		}
-
-		unset($raw);
 		
 		$pto = $dbo; unset($dbo);
 		foreach(self::goofs as $f) {
@@ -103,23 +97,18 @@ class enc_cookies {
 	}
 
     public function enc($ptok) { 
-		
-		$this->rawGooTokO = $ptok; // needed???
-	
-		$ra = [];
-		$etok = $ptok;
 		 
 		$dk = kwifs($this->oos, self::eknm); 
 		if (!$dk) {
 			$this->setKeyOb();
 			$dk = kwifs($this->oos, self::eknm); 
 		}
+	
+		$this->oos[$this->goonm] = $ptok;
 		
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			
 			kwas($dk, 'no enc key cook enc');
-			$this->oos[$this->goonm] = $ptok;
 			$this->oos[$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 		}
 		
