@@ -9,6 +9,15 @@ require_once('enc.php');
 require_once('gmailClient.php');
 
 class posEmailOAuth extends GooOAuthWrapper {
+	
+	
+	public static function revokeAccess() {
+		$o = new self();
+		$o->revokeToken();
+		dao_plain::deleteTokenStatic();
+		dao::expireCookies();
+		return $o->urlbase;
+	}
 
 	const peoaa = [
 							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 

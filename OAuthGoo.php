@@ -8,6 +8,8 @@ class GooOAUTHWrapper {
 	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
 	const tnms = ['refresh_token', 'access_token'];
 	
+	protected readonly string $urlbase;
+	
     private function setSpecificConfig() {
 		if (!($sn = kwifs($_SERVER, 'SERVER_NAME'))) $sn = 'example.com';
 		$this->urlbase = $oarurl = 'https://' .		 $sn .  $this->thea['upath'];

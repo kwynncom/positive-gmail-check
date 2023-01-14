@@ -17,12 +17,11 @@ class pemsDoit {
 			$ulo = new usageLimit();
 			$gdo = new gmailClient();
 			if (doRevoke()) {
-				isucookie::unset();
-				$gco = new posEmailOAuth();
-				$url = $gco->forceGetOAuthURL(); 
-				$gco->revokeToken();
-				dao_plain::deleteTokenStatic();
-				dao::expireCookies();
+				// isucookie::unset();
+				// $gco = new posEmailOAuth();
+				// $url = $gco->forceGetOAuthURL(); 
+				$url = posEmailOAuth::revokeAccess();
+
 				kwas(false, 'revoking');
 			}
 			$ulo->putUse($gdo->checkEmail()); // *** get text / pre value of check, then check limit then check email

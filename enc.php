@@ -31,9 +31,7 @@ public function getTokenDB() {
 }
 
 public static function expireCookies() {
-	$fs = ['atekey', 'rtekey'];
-	foreach($fs as $f) if (isset($_COOKIE[$f])) kwscookie($f, false, false);
-	isucookie::unset();
+	enc_cookies::forceExpire();
 }
 
 public function upsertToken($ptok, $email = null) {
@@ -49,6 +47,11 @@ class enc_cookies {
 	const goofs  = GooOAUTHWrapper::tnms;
 	const eknm = 'enkey';
 	const conm = 'gooObWr';
+	
+	public static function forceExpire() {
+		if (isset($_COOKIE[self::conm])) kwscookie(self::conm, false, false);
+		isucookie::unset();
+	}
 	
 	public function __construct($goonm) {
 		$this->oos = [];
