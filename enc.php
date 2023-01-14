@@ -13,6 +13,9 @@ public function __construct($logo) {
 }
 
 public function getTokenDB() {
+	
+	return false; // ******
+	
 	$etok  = parent::getTokenDBO($this->cob->getekida());
 	if (!$etok) return false;
 	$dtok = $this->cob->dec($etok);
@@ -36,92 +39,110 @@ public static function expireCookies() {
 }
 
 public function upsertToken($ptok, $email = null) {
-	$etok = $this->cob->enc($ptok); $this->cob->wipe($ptok); unset($ptok);
+	$etok = $this->cob->enc($ptok); unset($ptok);
 	$emh = $this->cob->emailHash($email); unset($email);
-	parent::upsertToken($ptok, $emh);
+	parent::upsertToken($etok, $emh);
 }
 } // class
 
 class enc_cookies {
     //            1234567890123456 - 16 chars
     const iniv = 'P8ohKFo4nNae0ZBW';
-	const cofs = ['atekeyo', 'rtekeyo'];
 	const dbidfs = ['_id', 'r', 'rid'];
+	const goofs  = GooOAUTHWrapper::tnms;
+	const obsfx  = '_ob';
+	const keysfx = '_ekey';
+	
+	public function __construct() {
+		$this->oos = [];
+		$this->rawGooTokO = [];
+		$this->loadCookies();
+	}
 
-	private function wipe(&$o) {
-		static $ws = '';
-		static $wsa = [];
-		
-		if (!$ws) for ($i=0; $i < 300; $i++) $ws .= 'x';
-		
-		foreach(GooOAUTHWrapper::tnms as $f) {
-			$v = kwifs($o, $f);
-			if (!$v) continue;
-			$sz = strlen($v);
-			if (!($t = kwifs($wsa[$z]))) {
-				kwas($ws[$sz], 'wipe string not long enough');
-				$t = substr($ws, 0, $sz);
-				$wsa[$sz] = $t;
-			}
-
-			$o[$f] = $t;
-		}
+	private function loadCookies() {
+		foreach(self::goofs as $f) {
 			
+			$j = kwifs($_COOKIE, $f);
+			$a = [];
+			if ($j) $a = json_decode($j, true);
+			$this->oos[$f . self::obsfx] = $a;
+			foreach(self::dbidfs as $df => $dv)  $this->dbids[$f][$df] = $dv;
+		}
+		
+		return $this->dbids;
 	}
 	
 	public function getekida() {
 		
 		$ra = [];
 		
-		foreach(self::cofs as $fk => $f) {
+		if (!isset($this->oos)) $this->oos = [];
+		
+		foreach(self::goofs as $fk => $f) {
 			$ta = $this->getEKeyO($f);
-			$this->$f = $ta;
-			foreach(self::dbidfs as $df => $dv)  $ra[$fk][$df] = $dv;
+			$this->oos[$f . self::obsfx] = $ta;
 		}
 		
 		return $ra;
 	}
 	
 	public function dec($dbo) { 
+		if ($raw = $this->rawGooTokO) return $raw; unset($raw);
+		$this->loadCookie();
 		
-		$pt = openssl_decrypt($ct, 'AES-256-CBC', $this->getKey($coname), 0, self::iniv);
-		if (!$pt) return $pt;
-		$this->putCache($coname, $pt, $ct);
-		return $pt;
-	}
-	
+		$pto = $dbo; unset($dbo);
+		foreach(self::goofs as $f) {
+			if (!isset($pto[$f])) continue;
+			$sfx =  $f . self::obsfx;
+			$dk = kwifs($this->oos, $sfx, $f);
+			if ($dk)	$this->oos[$sfx][$f] = $pto[$f] = openssl_decrypt($ct, 'AES-256-CBC', $dk, 0, self::iniv);
+			else unset($pto[$f]);
+			
+		}
 
-	private function getCache($coname, $pt)		{ return kwifs($this, $coname, $pt);	}
-    private function putCache($coname, $pt, $ct) { $this->$coname[$pt] = $ct;		}
+		return $pto;
+	}
+
+    public function enc($ptok) { 
+		
+		$this->rawGooTokO = $ptok;
 	
-    public function enc($pt, $coname) { 
-		if ($o = $this->getCache($coname, $pt)) return $o;
-		$ct = openssl_encrypt($pt, 'AES-256-CBC', $this->getKey($coname), 0, self::iniv); 
-		$this->putCache($coname, $pt, $ct);
-		return $ct;
+		$etok = $ptok;
+		foreach(self::goofs as $f) {
+			if (!isset($ptok[$f])) continue;
+			$dk = kwifs($this->oos, $f . self::obsfx, $f);
+			$etok[$f] = $this->oos [$f . self::obsfx] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
+			unset($ptok[$f]);
+			$this->setKeyOb($f);
+			break; // if refresh token exists, no need for access token
+			
+		}
+		
+		$ra = $this->dbids;
+		$ra['goo_enc'] = $etok;
+		
+		return $ra;
 	}
     
-    private function getKey ($coname) {
-		if ($k = $this->getEKeyO($coname)) return $k;
+    private function getKey		($gobnm) {
+		if ($k = $this->getEKeyO($gobnm)) return $k;
 		self::getNewKeyO($coname);
 		return $cikey;
     }
 	
-	private function getEKeyO($coname) {
-		if (!($o = kwifs($_COOKIE,	    'coname'))) return false;
-		return json_decode($o, true);
-		
-	}
+
     
-	private static function getNewKeyO($coname) {
+	private function setKeyOb($gobnm) {
 		$tek = self::base62();
 		$a = [];
-		$a[$coname] = $tek;
+		$a[$gobnm . self::keysfx] = $tek;
 		$a['r'] = date('r');
 		$a['_id'] = dao_generic_3::get_oids();
 		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
+		$obsfx = $gobnm . self::obsfx;
+		$this->oos[$obsfx] = $a;
 		$j = json_encode($a);
-		kwscookie($coname, $j, isucookie::getOpts());	
+		kwscookie($obsfx, $j, isucookie::getOpts());	
 	}
 	
 	private static function putKeyO() {
