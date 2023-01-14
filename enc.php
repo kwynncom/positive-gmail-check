@@ -48,10 +48,9 @@ public function upsertToken($ptok, $email = null) {
 class enc_cookies {
     //            1234567890123456 - 16 chars
     const iniv = 'P8ohKFo4nNae0ZBW';
-	const dbidfs = ['_id', 'r', 'rid'];
 	const goofs  = GooOAUTHWrapper::tnms;
 	const obsfx  = '_ob';
-	const keysfx = '_ekey';
+	const dbidfs = ['_id', 'r', 'rid', 'enkey', 'tokty'];
 	
 	public function __construct() {
 		$this->oos = [];
@@ -62,11 +61,12 @@ class enc_cookies {
 	private function loadCookies() {
 		foreach(self::goofs as $f) {
 			
-			$j = kwifs($_COOKIE, $f);
+			$j = kwifs($_COOKIE, $f . self::obsfx);
+			if (!$j) return;
 			$a = [];
 			if ($j) $a = json_decode($j, true);
 			$this->oos[$f . self::obsfx] = $a;
-			foreach(self::dbidfs as $df => $dv)  $this->dbids[$f][$df] = $dv;
+			foreach(self::dbidfs as $df)  $this->dbids[$f][$df] = $a[$df];
 		}
 		
 		return $this->dbids;
@@ -135,12 +135,14 @@ class enc_cookies {
 	private function setKeyOb($gobnm) {
 		$tek = self::base62();
 		$a = [];
-		$a[$gobnm . self::keysfx] = $tek;
+		$a['enkey'] = $tek;
+		$a['tokty'] = $gobnm;
 		$a['r'] = date('r');
 		$a['_id'] = dao_generic_3::get_oids();
 		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
 		$obsfx = $gobnm . self::obsfx;
 		$this->oos[$obsfx] = $a;
+		foreach(self::dbidfs as $df)  $this->dbids[$gobnm][$df] = $a[$df];
 		$j = json_encode($a);
 		kwscookie($obsfx, $j, isucookie::getOpts());	
 	}
