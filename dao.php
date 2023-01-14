@@ -104,9 +104,12 @@ class dao_plain extends dao_generic_3 implements qemconfig {
    }
    
     protected function getTokenDBO($ido) {
+		
+		$id = kwifs($ido, '_id');
+		if (!$id) return false;
 
 
-		$rest1 = $this->tcoll->findOne(['_id' => $ido['_id']], ['sort' => [self::tfnm . '.created' => -1]]);
+		$rest1 = $this->tcoll->findOne(['_id' => $id], ['sort' => [self::tfnm . '.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
 		if ($this->freshOrCanRefresh($t)) return $t;
 
