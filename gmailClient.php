@@ -1,10 +1,7 @@
 <?php
 
 require_once('/opt/kwynn/kwutils.php');
-// require_once('enc.php');
-
 require_once('OAuthPosEmail.php');
-// require_once('GoogleClient.php');
 require_once('usageLimit/usageLimit.php');
 require_once('isUserCookie.php');
 

@@ -41,7 +41,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		foreach($t as $f => $v) $a[self::tfnm . '.' . $f] = $v;
 		return $a;
 	}
-
+/*
 	private function upByEmail($tok, $email) { // update token itself, being careful of refresh_token
 		
 		$ats = [];
@@ -65,18 +65,17 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$this->tcoll->deleteMany([self::atf => $tok['access_token'], 'addrValid' => false]);
 		
 		return;		
-	}
-	
+	} 	*/
     protected function upsertToken($trwo2, $email) {
 		
 		foreach($trwo2 as $ty => $trwo) {
 		
 			$goo = $trwo[self::tfnm];
 
-			if ($email) return $this->upByEmail($goo, $email);
+			// if ($email) $this->upByEmail($goo, $email);
 
 			$dat20 = [
-				'addr' => $trwo['_id'],
+				'addr' => $email ? $email : $trwo['_id'],
 				'addrValid' => false,
 				'created_tok' => date('r', $goo['created']),
 				// 'sids' => [vsid()],
@@ -88,23 +87,32 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		}
 	}
    
-   private function freshOrRefresh($tin) {
-	   if (isset( $tin['refresh_token'])) return (array) $tin;
+
+    
+   private function isActiveAT($tin) {
 	   $fs = ['access_token', 'created', 'expires_in'];
 	   foreach($fs as $f) if (!isset($tin[$f]))  return false;
-	   
 	   $d = time() - ($tin['created'] + $tin['expires_in']); 
-	   if ($d <= 0) return (array) $tin;
-	   return false;
+	   if ($d <= 0) return true;
+	   return false; 
    }
-    
-    protected function getTokenDBO() {
+ 
+   private function freshOrCanRefresh($tin) : bool {
+	   
+	   if ($this->isActiveAT($tin))		  return true;
+	   if (isset( $tin['refresh_token'])) return true;
+	   return false;
 
-        $rest1 = $this->tcoll->findOne(['sids' => ['$in' => [vsid()]]], ['sort' => ['gooTokenActual.created' => -1]]);
-		$t = kwifs($rest1, self::tfnm);
-		if ($t) $t = $this->freshOrRefresh($t);
-		if ($t) return $t;
-		else 	return false;
+   }
+   
+    protected function getTokenDBO($idos) {
+
+		foreach($idos as $ido) {
+			$rest1 = $this->tcoll->findOne(['_id' => $ido['_id']], ['sort' => [self::tfnm . '.created' => -1]]);
+			$t = kwifs($rest1, self::tfnm);
+			if ($this->freshOrCanRefresh($t)) return $t;
+		}
+		return false;
     }
     
     public function deleteTokenKwDB() {

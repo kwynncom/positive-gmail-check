@@ -81,15 +81,15 @@ class enc_cookies {
 	
 	public function dec($dbo) { 
 		if ($raw = $this->rawGooTokO) return $raw; unset($raw);
-		$this->loadCookie();
+		// $this->loadCookie();
 		
 		$pto = $dbo; unset($dbo);
 		foreach(self::goofs as $f) {
 			if (!isset($pto[$f])) continue;
 			$sfx =  $f . self::obsfx;
-			$dk = kwifs($this->oos, $sfx, $f);
+			$dk = kwifs($this->oos, $sfx, 'enkey');
 			if ($dk) {
-				 $tdc = openssl_decrypt($ct, 'AES-256-CBC', $dk, 0, self::iniv);
+				 $tdc = openssl_decrypt($pto[$f], 'AES-256-CBC', $dk, 0, self::iniv);
 				 if ($tdc) $this->oos[$sfx][$f] = $pto[$f] = $tdc;
 				 else unset($pto[$f]);
 			}
@@ -108,10 +108,10 @@ class enc_cookies {
 		$etok = $ptok;
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			$dk = kwifs($this->oos, $f . self::obsfx, $f);
+			$this->setKeyOb($f); // *** must move this
+			$dk = kwifs($this->oos, $f . self::obsfx, 'enkey'); kwas($dk, 'no enc key cook enc');
 			$etok[$f] = $this->oos [$f . self::obsfx] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 			unset($ptok[$f]);
-			$this->setKeyOb($f);
 			$ra[$f] = $this->dbids[$f];
 			$ra[$f][$this->goonm] = $etok;
 			break; // if refresh token exists, no need for access token
