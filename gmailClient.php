@@ -46,11 +46,11 @@ class gmailClient {
     public function getText() {
 	
 		$ro = kwifs($this, 'goomlo');
+		if (!$ro) return 'GooMR error';
 		$mo = $ro->getMessages();
 		if (is_array($mo)) return count($mo);
 		if (!$mo && $ro->getResultSizeEstimate() === 0) return 0;
-		if (!$ro) return 'nock';
-		return 'GooMR error';
+		return 'nock';
 	}
    
 } // end class
