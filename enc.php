@@ -36,10 +36,7 @@ public static function expireCookies() {
 }
 
 public function upsertToken($ptok, $email = null) {
-	$ptok['access_token' ] = $this->cob->enc($ptok['access_token' ], 'atekey');
-	if ($rt = kwifs($ptok, 'refresh_token'))
-		$ptok['refresh_token'] = $this->cob->enc($rt, 'rtekey'); unset($rt);
-		
+	$etok = $this->cob->enc($ptok); $this->cob->wipe($ptok); unset($ptok);
 	$emh = $this->cob->emailHash($email); unset($email);
 	parent::upsertToken($ptok, $emh);
 }
@@ -50,6 +47,27 @@ class enc_cookies {
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const cofs = ['atekeyo', 'rtekeyo'];
 	const dbidfs = ['_id', 'r', 'rid'];
+
+	private function wipe(&$o) {
+		static $ws = '';
+		static $wsa = [];
+		
+		if (!$ws) for ($i=0; $i < 300; $i++) $ws .= 'x';
+		
+		foreach(GooOAUTHWrapper::tnms as $f) {
+			$v = kwifs($o, $f);
+			if (!$v) continue;
+			$sz = strlen($v);
+			if (!($t = kwifs($wsa[$z]))) {
+				kwas($ws[$sz], 'wipe string not long enough');
+				$t = substr($ws, 0, $sz);
+				$wsa[$sz] = $t;
+			}
+
+			$o[$f] = $t;
+		}
+			
+	}
 	
 	public function getekida() {
 		

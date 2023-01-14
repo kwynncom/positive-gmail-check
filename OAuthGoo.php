@@ -6,6 +6,7 @@ require_once('log.php');
 class GooOAUTHWrapper {
 	
 	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
+	const tnms = ['access_token', 'refresh_token'];
 	
     private function setSpecificConfig() {
 		if (!($sn = kwifs($_SERVER, 'SERVER_NAME'))) $sn = 'example.com';
