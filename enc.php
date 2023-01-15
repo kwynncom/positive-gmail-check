@@ -41,7 +41,7 @@ public static function expireCookies() {
 public function getEmailHash($emain) { return $this->emailHash = $this->cob->emailHash($emain); }
 
 public function upsertToken($ptok, $emailHash = null) {
-	$etok = $this->cob->enc($ptok); unset($ptok);
+	$etok = $this->cob->enc($ptok, $emailHash); unset($ptok);
 	parent::upsertToken($etok, $emailHash);
 }
 } // class
@@ -52,6 +52,7 @@ class enc_cookies {
 	const goofs  = GooOAUTHWrapper::tnms;
 	const eknm = 'enkey';
 	const conm = 'gooObWr';
+	const keybits = 1024; // less than 2048 only apt for testing
 	
 	public static function forceExpire() {
 		if (isset($_COOKIE[self::conm])) kwscookie(self::conm, false, false);
@@ -65,17 +66,10 @@ class enc_cookies {
 	}
 
 	private function loadCookies() {
-		
-		foreach(self::goofs as $f) {
-			
-			$j = kwifs($_COOKIE, self::conm);
-			if (!$j) continue;
-			$a = [];
-			if ($j) $a = json_decode($j, true);
-			$this->oos = $a;
-		}
-		
-		return $this->getekida();
+					
+		if (($j = kwifs($_COOKIE, self::conm))) $this->oos = json_decode($j, true);
+		else $this->setKeyOb();
+
 	}
 	
 	public function getekida() { 
@@ -103,20 +97,36 @@ class enc_cookies {
 
 		return $pto;
 	}
-
-    public function enc($ptok) { 
-		 
-		$dk = kwifs($this->oos, self::eknm); 
-		if (!$dk) {
-			$this->setKeyOb();
-			$dk = kwifs($this->oos, self::eknm); 
+	
+	private function puk10($eh) {
+		if ($eh) $this->oos['emailHash'] = $eh;
+		else return;
+		
+		if (0) {
+		$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
+		$put = openssl_pkey_get_details($pro)['key'];
+		openssl_pkey_export($pro, $prt); unset($pro);
 		}
+		
+		
+		
+		return;
+		
+		
+	}
+
+    public function enc($ptok, $eh) { 
+		
+		$this->emailHash = $eh;
+		
+		$this->puk10($eh);
+		 
+		$dk = kwifs($this->oos, self::eknm);  kwas($dk, 'dec key should be set');
 	
 		$this->oos[$this->goonm] = $ptok;
 		
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			kwas($dk, 'no enc key cook enc');
 			$this->oos[$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 		}
 		
@@ -136,18 +146,23 @@ class enc_cookies {
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;
-		$a['r_cookie'] = date('r');
-		$a['_id'] = dao_generic_3::get_oids();
-		$a['rid'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
-
+		self::popIDs($a, 'baseCookie');
 		$this->oos = $a;
 		$this->renewCookie();
 	}
 	
+	public static function popIDs(array &$a, $nm) {
+		$a['_id']   = dao_generic_3::get_oids();
+		$a['idish'] = sprintf('%02d', random_int(1, 99)) . '-' . base62(2); // not unique, but rare; something to quickly visually check
+		$a['r_' . $nm] = date('r');
+		return;
+	}
+	
 	private function renewCookie() {
-		$a = [];
-		
-		foreach([self::eknm, 'r_cookie', '_id', 'rid'] as $f) $a[$f] = $this->oos[$f];
+				
+		// foreach([self::eknm, 'r_cookie', '_id', 'rid'] as $f) $a[$f] = $this->oos[$f];
+		$a = $this->oos;
+		unset($a[$this->goonm]);
 		$j = json_encode($a);
 		kwscookie(self::conm, $j, isucookie::getOpts());		
 	}
