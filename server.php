@@ -15,16 +15,20 @@ class pemsDoit {
 		$msgtxt = 'errSrvUnk';
 		$gdo = false;
 		$gco = false;
+		$ulo = false;
 
 		try { 
-			$gco = new positiveEmailCl();
+			$ulo = new usageLimit();
+			$gco = new positiveEmailCl($ulo);
+			$gdo = $gco;
+			
 			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
 			if (isrv('revoke') === 'Y') {
 				$url = $gco->revokeAccess();
 				kwas(false, 'revoking');
 			}
 			
-			$gdo = $gco;
+
 			$gdo->checkEmail();
 			$msgtxt = $gdo->getText();
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');

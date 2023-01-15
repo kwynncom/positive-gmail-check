@@ -7,8 +7,8 @@ require_once(__DIR__ . '/usageLimitDao.php');
 class usageLimit {
     
     const fname = 'usage.txt';
-    
     const testMode = false;
+	const useTypes = ['checked', 'oauth', 'revoke'];
     
     function __construct () {
 
@@ -39,12 +39,11 @@ class usageLimit {
 	if (isset($this->oex)) throw $this->oex;
     }
     
-    public function putUse($type) { 
+    public function putUse(string $ty) { 
 	
-	if (isset($_REQUEST['revoke']) && $_REQUEST['revoke'] === 'Y') $type = 'revoke';
-	
-	$this->dao->putUse($type);    
-	$this->checkLimit();
+		kwas(in_array($ty, self::useTypes), 'bad usage limit use type');
+		$this->dao->putUse($ty);    
+		$this->checkLimit();
 	
     }
     

@@ -4,6 +4,7 @@ require_once('OAuthGoo.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
 require_once('gmailGet.php');
+require_once('usageLimit/usageLimit.php');
 
 class positiveEmailCl extends GooOAuthWrapper {
 	
@@ -19,10 +20,12 @@ class positiveEmailCl extends GooOAuthWrapper {
 	const srvFile = 'server.php';
 	const srvPath = self::peoaa['upath'] . '/' . self::srvFile;
 	
-	protected $log;
+	protected OAuthLog		$log;
+	private   usageLimit	$ulo;
 
-	public function __construct() { 
-		$this->ulo = new usageLimit();
+	public function __construct(usageLimit $ulo = null) { 
+		
+		$this->ulo = $ulo ? $ulo : new usageLimit();
 		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
@@ -61,7 +64,7 @@ class positiveEmailCl extends GooOAuthWrapper {
 	
 	public function getText() { return $this->gmc->getText();	}
 	
-	public function regUsage($em, $mtin = false) {
+	public function regUsage(string $em, array $mtin = []) {
 		isucookie::set();
 		if ($mtin) $mt = $mtin;
 		else	   $mt = $this->client->getAccessToken();
