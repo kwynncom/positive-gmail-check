@@ -3,7 +3,6 @@
 require_once('/opt/kwynn/crackObject.php');
 
 require_once('OAuthGoo.php');
-require_once('util.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
 require_once('gmailGet.php');
