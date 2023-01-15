@@ -33,9 +33,15 @@ class positiveEmailCl extends GooOAuthWrapper {
 		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
+		if (isset($this->oauthurl)) return;
+		$this->setEmailSpecificStuff();
+
+	}
+	
+	private function setEmailSpecificStuff() {
 		$this->gmc = new gmailGetCl($this->getGoogleClient());
 		$this->emailAddress = $this->gmc->getEmailAddress();
-		$this->emailHash    = $this->dao->getEmailHash($this->emailAddress);
+		$this->emailHash    = $this->dao->getEmailHash($this->emailAddress);		
 	}
 	
 	public function getLog() { return $this->log->get(); }
@@ -71,7 +77,8 @@ class positiveEmailCl extends GooOAuthWrapper {
 	public function doUponAuth() {
 		isucookie::set();
 		$mt = $this->getMemTok();
-		$this->dao->upsertToken($mt);
+		$this->dao->upsertToken($mt); // this versus regUsage seems redundant but must be done this way
+		$this->setEmailSpecificStuff();
 		$this->regUsage($this->emailHash, $mt);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
