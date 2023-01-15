@@ -74,7 +74,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
 		$dat20 = [
 			'addr' => $email ? $email : $trwo['_id'],
-			'addrValid' => false,
+			'addrValid' => $email ? true : false,
 			'created_tok' => date('r', $goo['created']),
 			// 'sids' => [vsid()],
 		];

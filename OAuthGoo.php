@@ -114,6 +114,8 @@ class GooOAUTHWrapper {
 		
 		if (!($code = $this->getOAuthCode())) return false;
 		
+		$this->doUponOAInitCode();
+		
 		$this->log('nonce code');
         
 		$res = $this->client->authenticate($code);

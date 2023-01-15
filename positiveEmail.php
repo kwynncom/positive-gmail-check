@@ -22,7 +22,7 @@ class positiveEmailCl extends GooOAuthWrapper {
 	protected $log;
 
 	public function __construct() { 
-
+		$this->ulo = new usageLimit();
 		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
@@ -30,6 +30,9 @@ class positiveEmailCl extends GooOAuthWrapper {
 		$this->setEmailSpecificStuff();
 
 	}
+	
+	protected function doUponOAInitCode() { $this->ulo->putUse('oauth');	}
+
 	
 	private function setEmailSpecificStuff() {
 		$this->gmc = new gmailGetCl($this->getGoogleClient());
@@ -41,9 +44,13 @@ class positiveEmailCl extends GooOAuthWrapper {
 	
 	public function getEmailHash() { return $this->emailHash;	}
 	
+	public function getLimitsO() { return $this->ulo; }
+	
 	public function checkEmail() {
 		try { 
+			$this->ulo->putUse('checked');
 			$this->gmc->checkEmail();
+			$this->ulo->setEmail ($this->emailHash);
 			$this->regUsage($this->emailHash);
 		} 
 		catch(Exception $exv) {
@@ -72,6 +79,7 @@ class positiveEmailCl extends GooOAuthWrapper {
 	}
 	
 	public function revokeToken() {
+		$this->ulo->putUse('revoke');
 		$rr = parent::revokeToken();
 		$this->deleteToken();
 		return;

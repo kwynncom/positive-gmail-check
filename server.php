@@ -12,11 +12,11 @@ class pemsDoit {
 	function do10() {
 
 		$url = '';
-		$ulo = false;
 		$msgtxt = 'errSrvUnk';
+		$gdo = false;
+		$gco = false;
 
 		try { 
-			$ulo = new usageLimit();
 			$gco = new positiveEmailCl();
 			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
 			if (isrv('revoke') === 'Y') {
@@ -25,14 +25,15 @@ class pemsDoit {
 			}
 			
 			$gdo = $gco;
-			$ulo->putUse($gdo->checkEmail()); // *** get text / pre value of check, then check limit then check email
+			$gdo->checkEmail();
 			$msgtxt = $gdo->getText();
-			$ulo->setEmail($gdo->getEmailHash());
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-
+		$ulo = $gdo->getLimitsO();
+		
 		unset($gdo, $gco);
+		
 		
 		$now   = time();
 		$dates = date('g:i A', $now) . ' (' . date('s', $now) . 's) ' . date('l, F j, Y', $now); unset($now);
