@@ -11,27 +11,27 @@ class pemsDoit {
 	
 	function do10() {
 
+		$url = '';
 		$ulo = false;
-		$msgtxt = 'Error';
+		$msgtxt = 'errSrvUnk';
+
 		try { 
 			$ulo = new usageLimit();
-			$gdo = new gmailClient();
+			$gco = new posEmailOAuth();
+			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
 			if (doRevoke()) {
-				$url = posEmailOAuth::revokeAccess();
+				$url = $gco->revokeAccess();
 				kwas(false, 'revoking');
 			}
+			
+			$gdo = $gco;
 			$ulo->putUse($gdo->checkEmail()); // *** get text / pre value of check, then check limit then check email
 			$msgtxt = $gdo->getText();
-			$ulo->setEmail($gdo->getEmail());
+			$ulo->setEmail($gdo->getEmailHash());
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-		if (!isset($url)) {
-			if (!isset($gco)) $gco = new posEmailOAuth();
-			$url = $gco->getOAuthURL(); 
-		}
 
-		if (isset($gco)) $log = $gco->getLog();
 		unset($gdo, $gco);
 		
 		$now   = time();
@@ -56,7 +56,7 @@ class pemsDoit {
 	}
 	
 	function dook10($vsin) {
-		if (!kwifs($vsin, 'url')) isucookie::set();
+		// if (!kwifs($vsin, 'url')) isucookie::set();
 		extract($vsin);
 		$this->cleanseV($vsin);
 		$ulo->setPrev($vsin);

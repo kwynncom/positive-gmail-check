@@ -10,9 +10,8 @@ require_once('gmailClient.php');
 
 class posEmailOAuth extends GooOAuthWrapper {
 	
-	
-	public static function revokeAccess() {
-		$o = new self();
+	public function revokeAccess() {
+		$o = $this;
 		$o->revokeToken();
 		$o->deleteToken();
 		dao::expireCookies();
@@ -31,14 +30,36 @@ class posEmailOAuth extends GooOAuthWrapper {
 	protected $log;
 	
 	public function __construct() { 
+
 		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
+		$this->gmc = new gmailClient($this->getGoogleClient());
+		$this->emailAddress = $this->gmc->getEmailAddress();
+		$this->emailHash    = $this->dao->getEmailHash($this->emailAddress);
 	}
 	
 	public function getLog() { return $this->log->get(); }
 	
+	public function getEmailHash() { return $this->emailHash;	}
+	
+	public function checkEmail() {
+		try { 
+			$this->gmc->checkEmail();
+			$this->regUsage($this->emailHash);
+		} 
+		catch(Exception $exv) {
+			if ($exv->getCode() === 401) return $this->doOAuth();
+			else throw $exv;
+		}
+	}
+	
+	public function getText() {
+		return $this->gmc->getText();
+	}
+	
 	public function regUsage($em, $mtin = false) {
+		isucookie::set();
 		if ($mtin) $mt = $mtin;
 		else	   $mt = $this->getMemTok();
 		$this->dao->upsertToken($mt, $em);

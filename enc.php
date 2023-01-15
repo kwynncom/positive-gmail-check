@@ -38,10 +38,11 @@ public static function expireCookies() {
 	enc_cookies::forceExpire();
 }
 
-public function upsertToken($ptok, $email = null) {
+public function getEmailHash($emain) { return $this->emailHash = $this->cob->emailHash($emain); }
+
+public function upsertToken($ptok, $emailHash = null) {
 	$etok = $this->cob->enc($ptok); unset($ptok);
-	$emh = $this->cob->emailHash($email); unset($email);
-	parent::upsertToken($etok, $emh);
+	parent::upsertToken($etok, $emailHash);
 }
 } // class
 
