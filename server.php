@@ -1,6 +1,6 @@
 <?php
 require_once('usageLimit/usageLimit.php');
-require_once('gmailClient.php');
+require_once('positiveEmail.php');
 require_once('isUserCookie.php');
 
 class pemsDoit {
@@ -17,7 +17,7 @@ class pemsDoit {
 
 		try { 
 			$ulo = new usageLimit();
-			$gco = new posEmailOAuth();
+			$gco = new positiveEmailCl();
 			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
 			if (doRevoke()) {
 				$url = $gco->revokeAccess();

@@ -1,5 +1,3 @@
 <?php
-
-require_once('OAuthPosEmail.php');
-
-new posEmailOAuth();
+require_once('positiveEmail.php');
+new positiveEmailCl();

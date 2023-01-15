@@ -24,7 +24,9 @@ from memory. Update: an hour later - actually, maybe not.  It was the encryption
 I think the logic needs to be that upon insert or update, if a row exists with a refresh key and another doesn't switch the sid to the 
 	refresh row.  
 
-remove dao reference in gmailClient, gmailClient should call $client / OAuthPosEmail object for this
+// intentional mis-spellings; see note
+remove dao reference in gmaiCli, gmailClient should call $client / OAutPoEma (intentionally misspelled so I don't find it in searches)
+	 object for this
 	the tokens in the database should be saved by refresh and access because that is what is unique.  
 	A session_id can't authorize more than one email without confusion, but one email ...
 	Actually, this needs more thought.  My logic doesn't seem quite right in any event.

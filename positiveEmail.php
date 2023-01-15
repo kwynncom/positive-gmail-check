@@ -6,9 +6,9 @@ require_once('OAuthGoo.php');
 require_once('util.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
-require_once('gmailClient.php');
+require_once('gmailGet.php');
 
-class posEmailOAuth extends GooOAuthWrapper {
+class positiveEmailCl extends GooOAuthWrapper {
 	
 	public function revokeAccess() {
 		$o = $this;
@@ -34,7 +34,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 		$this->log = new OAuthLog();
 		$this->setDao();
 		parent::__construct(self::peoaa);
-		$this->gmc = new gmailClient($this->getGoogleClient());
+		$this->gmc = new gmailGetCl($this->getGoogleClient());
 		$this->emailAddress = $this->gmc->getEmailAddress();
 		$this->emailHash    = $this->dao->getEmailHash($this->emailAddress);
 	}
@@ -54,9 +54,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 		}
 	}
 	
-	public function getText() {
-		return $this->gmc->getText();
-	}
+	public function getText() { return $this->gmc->getText();	}
 	
 	public function regUsage($em, $mtin = false) {
 		isucookie::set();
@@ -75,8 +73,7 @@ class posEmailOAuth extends GooOAuthWrapper {
 		isucookie::set();
 		$mt = $this->getMemTok();
 		$this->dao->upsertToken($mt);
-		$em = gmailClient::getEmailStatic($this);
-		$this->regUsage($em, $mt);
+		$this->regUsage($this->emailHash, $mt);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}
