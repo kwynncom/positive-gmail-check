@@ -19,7 +19,7 @@ class pemsDoit {
 			$ulo = new usageLimit();
 			$gco = new positiveEmailCl();
 			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
-			if (kwifs($_REQUEST, 'revoke') === 'Y') {
+			if (isrv('revoke') === 'Y') {
 				$url = $gco->revokeAccess();
 				kwas(false, 'revoking');
 			}

@@ -1,7 +1,5 @@
 <?php
 
-require_once('/opt/kwynn/crackObject.php');
-
 require_once('OAuthGoo.php');
 require_once('isUserCookie.php');
 require_once('enc.php');
@@ -9,25 +7,20 @@ require_once('gmailGet.php');
 
 class positiveEmailCl extends GooOAuthWrapper {
 	
-	public function revokeAccess() {
-		$o = $this;
-		$o->revokeToken();
-		$o->deleteToken();
-		dao::expireCookies();
-		return $o->urlbase;
-	}
-
 	const peoaa = [
-							'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
-							'sfx' => '.json',
-							'scope' => Google_Service_Gmail::GMAIL_METADATA, 
-							'upath' => '/t/7/12/email/',
-							'osfx' => '_live_active_output',
-							'redbase' => 'receiveAuthCode.php',
-							];
+					'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
+					'sfx' => '.json',
+					'scope' => Google_Service_Gmail::GMAIL_METADATA, 
+					'upath' => '/t/7/12/email/',
+					'osfx' => '_live_active_output',
+					'redbase' => 'receiveAuthCode.php',
+				];
+	
+	const srvFile = 'server.php';
+	const srvPath = self::peoaa['upath'] . '/' . self::srvFile;
 	
 	protected $log;
-	
+
 	public function __construct() { 
 
 		$this->log = new OAuthLog();
@@ -64,19 +57,13 @@ class positiveEmailCl extends GooOAuthWrapper {
 	public function regUsage($em, $mtin = false) {
 		isucookie::set();
 		if ($mtin) $mt = $mtin;
-		else	   $mt = $this->getMemTok();
+		else	   $mt = $this->client->getAccessToken();
 		$this->dao->upsertToken($mt, $em);
 	}
 
-	private function getMemTok() {
-		$a = crackObject::crackGoo($this->client);
-		$f = kwifs($a, 'Google_Clienttoken');
-		return $f;
-	}
-	
 	public function doUponAuth() {
 		isucookie::set();
-		$mt = $this->getMemTok();
+		$mt = $this->client->getAccessToken();
 		$this->dao->upsertToken($mt); // this versus regUsage seems redundant but must be done this way
 		$this->setEmailSpecificStuff();
 		$this->regUsage($this->emailHash, $mt);
@@ -89,9 +76,16 @@ class positiveEmailCl extends GooOAuthWrapper {
 		$this->deleteToken();
 		return;
     }
+
+	public function revokeAccess() {
+		$o = $this;
+		$o->revokeToken();
+		$o->deleteToken();
+		dao::expireCookies();
+		return $o->urlbase;
+	}
 	
 	public	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
 	protected function getSavedToken() { return $this->dao->getTokenDB();	}
 	private   function setDao()		   { $this->dao = new dao($this->log);		}
-	
 }

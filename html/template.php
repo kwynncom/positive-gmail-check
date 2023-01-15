@@ -6,7 +6,7 @@
 
 <title>quick email count</title>
 
-<link rel='stylesheet' type='text/css' href='qemail.css'>
+<link rel='stylesheet' type='text/css' href='html/qemail.css'>
 
 <script src='/opt/kwynn/js/utils.js'></script>
 

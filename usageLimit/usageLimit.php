@@ -2,7 +2,7 @@
 
 require_once('/opt/kwynn/kwutils.php');
 
-require_once(__DIR__ . '/dao.php');
+require_once(__DIR__ . '/usageLimitDao.php');
 
 class usageLimit {
     
@@ -12,15 +12,15 @@ class usageLimit {
     
     function __construct () {
 
-	startSSLSession(1);
-	
-	$lim[] = ['type' => 'checked', 'limits' => [86400 => 175, 3600 => 45, 60 => 8, 5 => 1]];
-	$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
-	$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
-	
-	$this->lim = $lim;
+		startSSLSession();
 
-	$this->dao = new daoUsage();
+		$lim[] = ['type' => 'checked', 'limits' => [86400 => 175, 3600 => 45, 60 => 8, 5 => 1]];
+		$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
+		$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
+
+		$this->lim = $lim;
+
+		$this->dao = new daoUsage();
     }
     
     public function setEmail($email) { $this->dao->setEmail($email); }
