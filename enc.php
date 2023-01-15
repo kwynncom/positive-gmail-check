@@ -51,35 +51,36 @@ class enc_cookies {
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const goofs  = GooOAUTHWrapper::tnms;
 	const eknm = 'enkey';
-	const cooBasenm = 'gooObWr';
-	const cooPub = 'kwPEpub';
-	const cooPri = 'kwPEpri';
+	const cooBas = 'bas';
+	const cooPub = 'pub';
+	const cooPri = 'pri';
+	const ofs = [self::cooBas, self::cooPub, self::cooPri];
 
 	const keybits = 1024; // less than 2048 only apt for testing
 	
 	public static function forceExpire() {
-		if (isset($_COOKIE[self::cooBasenm])) kwscookie(self::cooBasenm, false, false);
+		foreach(self::ofs as $f) if (isset($_COOKIE[$f])) kwscookie($f, false, false);
 		isucookie::unset();
 	}
 	
 	public function __construct($goonm) {
-		$this->oos = [];
-		$this->pra = [];
-		
+		$this->oas = [];
+		foreach(self::ofs as $f) $this->oas[$f] = [];
 		$this->goonm = $goonm;
 		$this->loadCookies();
 	}
 
 	private function loadCookies() {
-					
-		if (($j = kwifs($_COOKIE, self::cooBasenm))) $this->oos = json_decode($j, true);
-		else $this->setKeyOb();
+		
+		foreach(self::ofs as $f) if (($j = kwifs($_COOKIE, $f))) $this->oas[$f] = json_decode($j, true);
+		$this->setKeyOb();
 
 	}
 	
 	public function getekida() { 
 		$ids = [];
-		$v = $this->oos;
+		$v = kwifs($this, 'oas', self::cooBas);
+		if (!$v) return [];
 		unset($v[self::eknm]);
 		return $v;
 		
@@ -90,10 +91,10 @@ class enc_cookies {
 		$pto = $dbo; unset($dbo);
 		foreach(self::goofs as $f) {
 			if (!isset($pto[$f])) continue;
-			$dk = kwifs($this->oos, self::eknm);
+			$dk = kwifs($this, 'oas', self::cooBas, self::eknm);
 			if ($dk) {
 				 $tdc = openssl_decrypt($pto[$f], 'AES-256-CBC', $dk, 0, self::iniv);
-				 if ($tdc) $this->oos[$this->goonm][$f] = $pto[$f] = $tdc;
+				 if ($tdc) $this->oas[self::cooBas][$this->goonm][$f] = $pto[$f] = $tdc;
 				 else unset($pto[$f]);
 			}
 			else unset($pto[$f]);
@@ -104,17 +105,20 @@ class enc_cookies {
 	}
 	
 	private function puk10($eh) {
-		if ($eh) $this->oos['emailHash'] = $eh;
+		if ($eh) $this->oas[self::cooBas]['emailHash'] = $eh;
 		else return;
 		
 		if (1) {
 			$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
 			$put = openssl_pkey_get_details($pro)['key'];
 			openssl_pkey_export($pro, $prt); unset($pro);
-			$this->pra = [];
-			$this->pra[self::cooPub] = $put;
-			$this->pra[self::cooPri] = $prt;
-			self::popIDs($this->pra, 'keypair');
+			$a = [];
+			$a[self::cooPub] = $put;
+			$a[self::cooPri] = $prt;
+			$this->oas[self::cooBas]['keypairMeta'] = [];
+			self::popIDs($this->oas[self::cooBas]['keypairMeta'], 'keypair');
+			$this->oas = kwam($this->oas, $a);
+			kwynn();
 		}
 		return;
 		
@@ -127,20 +131,20 @@ class enc_cookies {
 		
 		$this->puk10($eh);
 		 
-		$dk = kwifs($this->oos, self::eknm);  kwas($dk, 'dec key should be set');
+		$dk = kwifs($this, 'oas', self::cooBas, self::eknm);  kwas($dk, 'dec key should be set');
 	
-		$this->oos[$this->goonm] = $ptok;
+		$this->oas[self::cooBas][$this->goonm] = $ptok;
 		
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			$this->oos[$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
+			$this->oas[self::cooBas][$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
 		}
 		
 		return $this->getoosWOKey();
 	}
     
 	private function getoosWOKey() { 
-		$o20 = $this->oos;
+		$o20 = $this->oas[self::cooBas];
 		$key = kwifs($o20, self::eknm); 	kwas($key, 'confirming key so I can delete it - failed');
 		unset       ($o20 [self::eknm], $key);
 		$key = kwifs($o20, self::eknm); 
@@ -149,11 +153,16 @@ class enc_cookies {
 	}
   
 	private function setKeyOb() {
+		
+		if (kwifs($this, 'oas', self::cooBas)) {
+			return;
+		}
+		
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;
 		self::popIDs($a, 'baseCookie');
-		$this->oos = $a;
+		$this->oas[self::cooBas] = $a;
 		$this->renewCookie();
 	}
 	
@@ -170,17 +179,14 @@ class enc_cookies {
 	}
 
 	private function renewPrivCoo() {
-		foreach([self::cooPub, self::cooPri] as $f) {
-			$a = kwifs($this, 'pra', $f);
-			if ($a) kwscookie($f, json_encode($a), isucookie::getOpts());					
-		}
+		foreach([self::cooPub, self::cooPri] as $f) if ($a = kwifs($this, 'oas', $f)) kwscookie($f, json_encode($a), isucookie::getOpts());					
 	}
 
 	private function renewBaseCoo() {
-		$a = $this->oos;
+		$a = kwifs($this->oas, self::cooBas);
 		unset($a[$this->goonm]);
 		$j = json_encode($a);
-		kwscookie(self::cooBasenm, $j, isucookie::getOpts());			
+		kwscookie(self::cooBas, $j, isucookie::getOpts());			
 	}
 	
     private static function base62() {
