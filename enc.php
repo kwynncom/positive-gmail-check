@@ -51,23 +51,28 @@ class enc_cookies {
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const goofs  = GooOAUTHWrapper::tnms;
 	const eknm = 'enkey';
-	const conm = 'gooObWr';
+	const cooBasenm = 'gooObWr';
+	const cooPub = 'kwPEpub';
+	const cooPri = 'kwPEpri';
+
 	const keybits = 1024; // less than 2048 only apt for testing
 	
 	public static function forceExpire() {
-		if (isset($_COOKIE[self::conm])) kwscookie(self::conm, false, false);
+		if (isset($_COOKIE[self::cooBasenm])) kwscookie(self::cooBasenm, false, false);
 		isucookie::unset();
 	}
 	
 	public function __construct($goonm) {
 		$this->oos = [];
+		$this->pra = [];
+		
 		$this->goonm = $goonm;
 		$this->loadCookies();
 	}
 
 	private function loadCookies() {
 					
-		if (($j = kwifs($_COOKIE, self::conm))) $this->oos = json_decode($j, true);
+		if (($j = kwifs($_COOKIE, self::cooBasenm))) $this->oos = json_decode($j, true);
 		else $this->setKeyOb();
 
 	}
@@ -102,14 +107,15 @@ class enc_cookies {
 		if ($eh) $this->oos['emailHash'] = $eh;
 		else return;
 		
-		if (0) {
-		$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
-		$put = openssl_pkey_get_details($pro)['key'];
-		openssl_pkey_export($pro, $prt); unset($pro);
+		if (1) {
+			$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
+			$put = openssl_pkey_get_details($pro)['key'];
+			openssl_pkey_export($pro, $prt); unset($pro);
+			$this->pra = [];
+			$this->pra[self::cooPub] = $put;
+			$this->pra[self::cooPri] = $prt;
+			self::popIDs($this->pra, 'keypair');
 		}
-		
-		
-		
 		return;
 		
 		
@@ -159,16 +165,22 @@ class enc_cookies {
 	}
 	
 	private function renewCookie() {
-				
-		// foreach([self::eknm, 'r_cookie', '_id', 'rid'] as $f) $a[$f] = $this->oos[$f];
+		$this->renewPrivCoo();
+		$this->renewBaseCoo();
+	}
+
+	private function renewPrivCoo() {
+		foreach([self::cooPub, self::cooPri] as $f) {
+			$a = kwifs($this, 'pra', $f);
+			if ($a) kwscookie($f, json_encode($a), isucookie::getOpts());					
+		}
+	}
+
+	private function renewBaseCoo() {
 		$a = $this->oos;
 		unset($a[$this->goonm]);
 		$j = json_encode($a);
-		kwscookie(self::conm, $j, isucookie::getOpts());		
-	}
-	
-	private static function putKeyO() {
-		
+		kwscookie(self::cooBasenm, $j, isucookie::getOpts());			
 	}
 	
     private static function base62() {
