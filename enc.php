@@ -104,7 +104,7 @@ class enc_cookies {
 	private function puk10() {
 		
 		if (kwifs($this, 'oas', self::cooPri)) return;
-		if (1) {
+		if (0) { // *******
 			$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
 			$put = openssl_pkey_get_details($pro)['key'];
 			openssl_pkey_export($pro, $prt); unset($pro);
@@ -129,7 +129,7 @@ class enc_cookies {
 		isucookie::set();
 		
 		$this->setKeyOb();
-		$this->puk10();
+		// $this->puk10();
 		$this->renewCookie();		
 	}
 	
@@ -139,13 +139,13 @@ class enc_cookies {
 		
 		$this->setAllOnTok();
 
-		$dk = kwifs($this, 'oas', self::cooBas, self::eknm);  kwas($dk, 'dec key should be set');
+		$sk = kwifs($this, 'oas', self::cooBas, self::eknm);  kwas($sk, 'sym key should be set');
 	
 		$this->oas[self::cooBas][$this->goonm] = $ptok;
 		
 		foreach(self::goofs as $f) {
 			if (!isset($ptok[$f])) continue;
-			$this->oas[self::cooBas][$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $dk, 0, self::iniv); 
+			$this->oas[self::cooBas][$this->goonm][$f] = openssl_encrypt($ptok[$f], 'AES-256-CBC', $sk, 0, self::iniv); 
 		}
 		
 		return $this->getoosWOKey();
@@ -165,10 +165,17 @@ class enc_cookies {
 		if (kwifs($this, 'oas', self::cooBas)) {
 			return;
 		}
-		$this->puk10();
+		// $this->puk10();
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;
+		
+		$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
+		$put = openssl_pkey_get_details($pro)['key'];
+		openssl_pkey_export($pro, $prt); unset($pro);
+		$a[self::cooPub] = $put;
+		$a[self::cooPri] = $prt;
+				
 		self::popIDs($a, 'baseCookie');
 		$this->oas[self::cooBas] = $a;
 	}
@@ -181,16 +188,10 @@ class enc_cookies {
 	}
 	
 	private function renewCookie() {
-		$this->renewPrivCoo();
+		// $this->renewPrivCoo();
 		$this->renewBaseCoo();
 	}
 
-	private function renewPrivCoo() {
-		foreach([self::cooPub, self::cooPri] as $f) {
-			$a = kwifs($this, 'oas', $f);
-			kwscookie($f, json_encode($a), isucookie::getOpts());					
-		}
-	}
 
 	private function renewBaseCoo() {
 		$a = kwifs($this->oas, self::cooBas);
