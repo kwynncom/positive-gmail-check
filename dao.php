@@ -37,6 +37,15 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		return $a;
 	}
 
+	public static function ssdwp(array &$a, string $p = '') {
+		
+		if ($p) $p .= '_';
+		
+		setSessionDets($d);
+		foreach($d as $k => $v) $a[$p . '' . $k] = $v;
+		return;
+	}
+	
     protected function upsertToken($trwo, $email) {
 		
 		$goo = $trwo[self::tfnm];
@@ -48,6 +57,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 			// 'sids' => [vsid()],
 		];
 
+		self::ssdwp($dat20, 'privowner');
 		$dat = kwam($dat20, $trwo);
 		
 		$this->savePub($dat); 
@@ -59,7 +69,11 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	}
 	
 	protected function updatePubsWithSym(array $a) {
+		
+		setSessionDets($dets);
+		
 		foreach($a as $_id => $dat) {
+			self::ssdwp($dat, 'keyprovider');
 			$res = $this->pcoll->upsert(['_id' => $_id], $dat);
 			continue;
 		}

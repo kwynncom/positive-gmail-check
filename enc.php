@@ -2,8 +2,6 @@
 
 require_once('dao.php');
 
-function vsid() { return hash('sha256', startSSLSession()); }
-
 class dao extends dao_plain {
 	
 public function __construct($logo) {
@@ -43,11 +41,12 @@ public function getEmailHash($emain) { return $this->emailHash = $this->cob->ema
 public function upsertToken($ptok, $emailHash = null) {
 	$etok = $this->cob->enc($ptok, $emailHash); unset($ptok);
 	parent::upsertToken($etok, $emailHash);
-	$this->usePubKeys($etok['_id'], $emailHash);
+	if (!$emailHash) return;
+	$this->usePubKeys(isset($etok['refresh_token']), $etok['created'], $etok['_id'], $emailHash);
 }
 
-private function usePubKeys($id, $emh) {
-	$a = parent::getPubKeys($id, $emh);
+private function usePubKeys(bool $isrt, int $cre, string $id, string $emh) {
+	$a = parent::getPubKeys(     $isrt,     $cre,        $id,	     $emh);
 	parent::updatePubsWithSym($this->cob->encWithPub($a));
 }
 
