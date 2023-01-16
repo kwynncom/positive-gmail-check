@@ -80,9 +80,12 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 	}
    
-	protected function getPubKeys(string $_id, string | null $emh) : array {
+	protected function getPubKeys(bool $isrt, int $cre, string $_id, string | null $emh) : array {
 		if (!$emh) return [];
-		$a = $this->pcoll->find(['addrValid' => true, 'addr' => $emh, '_id' => ['$ne' => $_id]],
+		
+		$q10 = ['addrValid' => true, 'addr' => $emh, '_id' => ['$ne' => $_id]];
+		
+		$a = $this->pcoll->find($q10,
 								['projection' => ['_id' => true, 'addr' => true, 'pub' => true]]);
 		
 		if (!$a) return [];

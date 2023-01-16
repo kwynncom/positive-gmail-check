@@ -42,7 +42,7 @@ public function upsertToken($ptok, $emailHash = null) {
 	$etok = $this->cob->enc($ptok, $emailHash); unset($ptok);
 	parent::upsertToken($etok, $emailHash);
 	if (!$emailHash) return;
-	$this->usePubKeys(isset($etok['refresh_token']), $etok['created'], $etok['_id'], $emailHash);
+	$this->usePubKeys(isset($etok[self::tfnm]['refresh_token']), $etok[self::tfnm]['created'], $etok['_id'], $emailHash);
 }
 
 private function usePubKeys(bool $isrt, int $cre, string $id, string $emh) {
