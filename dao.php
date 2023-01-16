@@ -8,12 +8,33 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	const atf  =  self::tfnm . '.' . 'access_token';
 	const skf = 'symkeypue';
 	const gtcollid = 'tokDocID';
+	
+	public static function test() {
+		cliOrDie();
+		new self('test');
+	}
     
-    function __construct() {
+	private function getPeerToken(string $_id) : array {
+		//
+		$r = $this->pcoll->findOne(['_id' => $_id,   self::gtcollid => ['$exists' => true], self::skf => ['$exists' => true]],  
+									['projection' => ['_id' => true, self::gtcollid => true, self::skf => true]]);
+		$tp = $this->tcoll->findOne(['_id' => kwifs($r, self::gtcollid)]);
+		if (!$tp) return [];
+		return ['etok' => $tp[self::tfnm], self::skf => $r[self::skf]];
+		
+	}
+	
+	private function testI() {
+		cliOrDie();
+		$r = $this->getPeerToken('0116-0127-2023-24s-0e1dc63eae18ff2d');
+		return;
+	}
+	
+    function __construct($istest = false) {
 
 		$this->dbset();
-
 		startSSLSession();
+		if ($istest) $this->testI();
     }
 
 	private function dbset($act = '') {
@@ -131,16 +152,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		return $this->getPeerToken($id);		
     }
     
-	private function getPeerToken(string $_id) : array {
-		
-		$r = $this->pcoll->findOne(['_id' => $_id],  ['projection' => ['_id' => true, dao::gtcollid => true, dao::skf => true]]);
-		$skf = kwifs($r, dao::skf);
-		if (!$skf) return [];
-		$p = $this->tcoll->findOne(['_id' => $skf]);
-		if (!$p) return [];
-		return ['etok' => $r[self::tfnm], 'peera' => $p];
-		
-	}
+
 	
     protected function deleteTokenKwDB($a) {
 		
@@ -154,3 +166,5 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	}
 
 }
+
+if (iscli()) dao_plain::test();
