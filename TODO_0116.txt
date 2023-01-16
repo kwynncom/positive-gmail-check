@@ -1,0 +1,29 @@
+Be very careful of reproducing the peer key scenario.
+
+Remember that I don't receive cookies with Strict set upon "code" / init, pre-token code.  I don't have it before the email address is known or 
+after.
+
+Does a redirect to "Actual" solve several problems?  What I just put in .htaccess?
+	Yes, it does seem to solve several problems, or maybe.
+
+If I get the sym key from the private key, the process is the same--I can now save the unencrypted sym key in the cookie.
+
+Ideally, the only 2 document that should be saved for a given email are a refresh document and a non-refresh document.  As soon as the access token 
+expires, no reason to keep it.  It may be worth public keys for a lone access token (as opposed to one paired with rt).  The rest of the documents 
+are pub key documents, beyond those 2.
+
+ON THE OTHER HAND, I have to save separate documents until public keys can be used.  So what I have now is probably ok.
+
+The sym key enc by public should be labelled at or rt.
+
+Detect the loop and revoke upon 2 - 3 loops?  And delete the data properly.  And cookies.
+
+sids are perhaps useful for deleting files once a session has the rt.
+
+sids probably don't help - sids are meaningless without keys being saved.  We know it's the same email address through the function of the system.
+	Then again...
+
+I thought there was nothing for it in that if a code is requested, and I had to start over with keys.   - see .htaccess / redirect above.  Perhaps 
+not.
+
+

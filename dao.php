@@ -149,7 +149,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$t = kwifs($rest1, self::tfnm);
 		if ($this->freshOrCanRefresh($t, time() < strtotime('2023-01-16 01:35'))) return $t;
 		
-		return $this->getPeerToken($id);		
+		return [];
+		// return $this->getPeerToken($id);		 // ***** almost working
     }
     
 
