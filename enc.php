@@ -48,7 +48,7 @@ public function upsertToken($ptok, $emailHash = null) {
 
 private function usePubKeys($id, $emh) {
 	$a = parent::getPubKeys($id, $emh);
-	$this->cob->encWithPub($a);
+	parent::updatePubsWithSym($this->cob->encWithPub($a));
 }
 
 } // class
@@ -149,13 +149,14 @@ class enc_cookies {
 		$po = openssl_pkey_get_public($this->oas[self::cooBas][self::cooPub]);
 		$sk = $this->getSymKey();
 
-		
+		$ret = [];
 		foreach($a as $r) {
+			kwas($r['addr'] === $this->emailHash, 'email hashes do not match - pub key enc'); // sanity check
 			openssl_public_encrypt($sk,  $cit, $po);
-			$a[$r['_id']]['symkeypue'] = $cit;
+			$ret[$r['_id']]['symkeypue'] = base64_encode($cit); unset($cit);
 		}
 		
-		return $a;
+		return $ret;
 	}
 	
 

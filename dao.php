@@ -57,6 +57,14 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$this->tcoll->upsert(['_id' => $trwo['_id']], $dat);
 
 	}
+	
+	protected function updatePubsWithSym(array $a) {
+		foreach($a as $_id => $dat) {
+			$res = $this->pcoll->upsert(['_id' => $_id], $dat);
+			continue;
+		}
+		
+	}
    
 	protected function getPubKeys(string $_id, string | null $emh) : array {
 		if (!$emh) return [];
