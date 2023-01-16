@@ -22,7 +22,7 @@ public function getTokenDB() {
 	$sk = '';
 	if (kwifs($etok, 'peer')) {
 		$sk = $etok[self::skf]; 
-		$etoke = $etok[self::tfnm];
+		$etok = $etok[self::tfnm];
 	}
 		
 	

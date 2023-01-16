@@ -34,7 +34,7 @@ class pemsDoit {
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
 
-		$ulo = $gdo->getLimitsO();
+		$ulo = $gdo ? $gdo->getLimitsO() : new usageLimit();
 		
 		unset($gdo, $gco);
 		
