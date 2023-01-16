@@ -18,7 +18,15 @@ public function getTokenDB() {
 	
 	$etok  = parent::getTokenDBO($this->cob->getekida());
 	if (!$etok) return false;
-	$dtok = $this->cob->dec($etok);
+	
+	$sk = '';
+	if (kwifs($etok, 'peer')) {
+		$sk = $etok[self::skf]; 
+		$etoke = $etok[self::tfnm];
+	}
+		
+	
+	$dtok = $this->cob->dec($etok, $sk);
 
 	$datok = kwifs($dtok, 'access_token');
 	if (!$datok) {
@@ -66,7 +74,7 @@ class enc_cookies {
 	const keybits = 1024; // less than 2048 only apt for testing
 	
 	public static function forceExpire() {
-		foreach(self::ofs as $f) if (isset($_COOKIE[$f])) kwscookie($f, false, false);
+		if (isset($_COOKIE[self::cooBas])) kwscookie(self::cooBas, false, false);
 		isucookie::unset();
 	}
 	
@@ -90,29 +98,35 @@ class enc_cookies {
 	
 	private function getSymKey() { return kwifs($this, 'oas', self::cooBas, self::eknm);	}
 	
-	public function dec($dbo) { 
+	public function dec(array $dbo, string $pusk) { 
 		
 		$pto = $dbo; unset($dbo);
+		
+		$this->decFromPriv($pusk);
+		
 		$dk = $this->getSymKey();
 		
+		$ok = 0;
 		foreach(self::goofs as $f) {
 			if (!isset($pto[$f])) continue;
 			if ($dk) {
 				 $tdc = openssl_decrypt($pto[$f], 'AES-256-CBC', $dk, 0, self::iniv);
-				 if ($tdc) $this->oas[self::cooBas][$this->goonm][$f] = $pto[$f] = $tdc;
+				 if ($tdc) {
+					 $ok++;
+					 $this->oas[self::cooBas][$this->goonm][$f] = $pto[$f] = $tdc;
+				 }
 				 else unset($pto[$f]);
 			}
 			else unset($pto[$f]);
 			
 		}
+		
+		if ($ok) $this->renewCookie();
 
+		
 		return $pto;
 	}
-	
-	private function savePESK() {
-		
-	}
-	
+
 	private function setAllOnTok() {
 		isucookie::set();
 		$this->setKeyOb();
@@ -145,13 +159,13 @@ class enc_cookies {
   
 	public function encWithPub(array $a) : array {
 		
-		$po = openssl_pkey_get_public($this->oas[self::cooBas][self::cooPub]);
 		$sk = $this->getSymKey();
 
 		$ret = [];
 		foreach($a as $r) {
 			kwas($r['addr'] === $this->emailHash, 'email hashes do not match - pub key enc'); // sanity check
-			openssl_public_encrypt($sk,  $cit, $po);
+			$po = openssl_pkey_get_public($r['pub']);
+			kwas(openssl_public_encrypt($sk,  $cit, $po), 'pub key enc failed');
 			$ret[$r['_id']][dao_plain::skf] = base64_encode($cit); unset($cit);
 			$ret[$r['_id']][dao_plain::gtcollid] = $this->oas[self::cooBas]['_id'];
 			continue;
@@ -160,15 +174,21 @@ class enc_cookies {
 		return $ret;
 	}
 	
+	private function decFromPriv(string $cit) {
+		if (!$cit) return;
+		if (!($priv = kwifs($this, 'oas', self::cooBas, self::cooPri))) return;
+		if (!($pro = openssl_pkey_get_private($priv))) return;
+		if (!openssl_private_decrypt(base64_decode($cit), $pt, $pro)) return;
+		$this->oas[self::cooBas][self::eknm] = $pt;
 
+		
+	}
 
 	
 	private function setKeyOb() {
 		
-		if (kwifs($this, 'oas', self::cooBas)) {
-			return;
-		}
-
+		if (kwifs($this, 'oas', self::cooBas)) return;
+		
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;

@@ -20,7 +20,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 									['projection' => ['_id' => true, self::gtcollid => true, self::skf => true]]);
 		$tp = $this->tcoll->findOne(['_id' => kwifs($r, self::gtcollid)]);
 		if (!$tp) return [];
-		return ['etok' => $tp[self::tfnm], self::skf => $r[self::skf]];
+		return [self::tfnm => $tp[self::tfnm], self::skf => $r[self::skf], 'peer' => true];
 		
 	}
 	
@@ -147,10 +147,10 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 		$rest1 = $this->tcoll->findOne(['_id' => $id], ['sort' => [self::tfnm . '.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
-		if ($this->freshOrCanRefresh($t, time() < strtotime('2023-01-16 01:35'))) return $t;
+		if ($this->freshOrCanRefresh($t, time() < strtotime('2023-01-16 04:30'))) return $t;
 		
-		return [];
-		// return $this->getPeerToken($id);		 // ***** almost working
+		// return [];
+		return $this->getPeerToken($id);		 // ***** almost working
     }
     
 
