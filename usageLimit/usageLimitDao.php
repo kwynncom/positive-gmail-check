@@ -20,7 +20,7 @@ class daoUsage extends dao_generic_3 implements qemconfig {
 		$res = $this->ucoll->updateOne(['_id' => $this->iid], ['$set' => ['email' => $email]]);
     }
 
-	private static function setSessionDets(array &$a) { setSessionDets($a);	}
+	private static function setSessionDets(array &$a) { setSessionDets($a, true);	}
 
     public function putUse($type) {
 

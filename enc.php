@@ -78,7 +78,7 @@ class enc_cookies {
 	}
 
 	private function loadCookies() {
-		foreach(self::ofs as $f) if (($j = kwifs($_COOKIE, $f))) $this->oas[$f] = json_decode($j, true);
+		if (($j = kwifs($_COOKIE, self::cooBas))) $this->oas[self::cooBas] = json_decode($j, true);
 	}
 	
 	public function getekida() : array { 
@@ -152,7 +152,9 @@ class enc_cookies {
 		foreach($a as $r) {
 			kwas($r['addr'] === $this->emailHash, 'email hashes do not match - pub key enc'); // sanity check
 			openssl_public_encrypt($sk,  $cit, $po);
-			$ret[$r['_id']]['symkeypue'] = base64_encode($cit); unset($cit);
+			$ret[$r['_id']][self::skf] = base64_encode($cit); unset($cit);
+			$ret[$r['_id']][self::gtcollid] = $this->oas[self::cooBas]['_id'];
+			continue;
 		}
 		
 		return $ret;

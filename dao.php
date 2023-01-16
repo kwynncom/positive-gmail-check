@@ -6,6 +6,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	
 	const tfnm = 'gooTokEncDB';
 	const atf  =  self::tfnm . '.' . 'access_token';
+	const skf = 'symkeypue';
+	const gtcollid = 'tokDocID';
     
     function __construct() {
 
@@ -83,6 +85,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	protected function getPubKeys(bool $isrt, int $cre, string $_id, string | null $emh) : array {
 		if (!$emh) return [];
 		
+		if (!$isrt) return [];
 		$q10 = ['addrValid' => true, 'addr' => $emh, '_id' => ['$ne' => $_id]];
 		
 		$a = $this->pcoll->find($q10,
@@ -116,19 +119,29 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
    }
    
-    protected function getTokenDBO($ido) {
+    protected function getTokenDBO(array $ido) : array {
 		
 		$id = kwifs($ido, '_id');
-		if (!$id) return false;
-
-
+		if (!$id) return [];
+		
 		$rest1 = $this->tcoll->findOne(['_id' => $id], ['sort' => [self::tfnm . '.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
-		if ($this->freshOrCanRefresh($t)) return $t;
-
-		return false;
+		if (time() > strtotime('2023-01-16 00:25') && $this->freshOrCanRefresh($t)) return $t;
+		
+		return $this->getPeerToken($id);		
     }
     
+	private function getPeerToken(string $_id) : array {
+		// NOTE ****!!!! if you "turn off" the _id in projection, you can't match it!!!
+		$r = $this->pcoll->findOne(['_id' => $_id], ['projection' => ['_id' => 1, dao::gtcollid => 1, dao::skf => 1]]); unset($r['_id']);
+		$skf = kwifs($r, dao::skf);
+		if (!$skf) return [];
+		$p = $this->tcoll->findOne(['_id' => $skf]);
+		if (!$p) return [];
+		return ['etok' => $r[self::tfnm], 'peera' => $p];
+		
+	}
+	
     protected function deleteTokenKwDB($a) {
 		
 		$r = $this->tcoll->deleteOne(['_id' => $a['_id']]);
