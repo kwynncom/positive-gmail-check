@@ -50,7 +50,7 @@ class enc_cookies {
     //            1234567890123456 - 16 chars
     const iniv = 'P8ohKFo4nNae0ZBW';
 	const goofs  = GooOAUTHWrapper::tnms;
-	const eknm = 'enkey';
+	const eknm = 'symkey';
 	const cooBas = 'bas';
 	const cooPub = 'pub';
 	const cooPri = 'pri';
@@ -71,10 +71,7 @@ class enc_cookies {
 	}
 
 	private function loadCookies() {
-		
 		foreach(self::ofs as $f) if (($j = kwifs($_COOKIE, $f))) $this->oas[$f] = json_decode($j, true);
-		$this->setKeyOb();
-
 	}
 	
 	public function getekida() { 
@@ -104,10 +101,9 @@ class enc_cookies {
 		return $pto;
 	}
 	
-	private function puk10($eh) {
-		if ($eh) $this->oas[self::cooBas]['emailHash'] = $eh;
-		else return;
+	private function puk10() {
 		
+		if (kwifs($this, 'oas', self::cooPri)) return;
 		if (1) {
 			$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
 			$put = openssl_pkey_get_details($pro)['key'];
@@ -115,8 +111,12 @@ class enc_cookies {
 			$a = [];
 			$a[self::cooPub] = $put;
 			$a[self::cooPri] = $prt;
-			$this->oas[self::cooBas]['keypairMeta'] = [];
-			self::popIDs($this->oas[self::cooBas]['keypairMeta'], 'keypair');
+			
+			if (0) {
+				$this->oas[self::cooBas]['keypairMeta'] = [];
+				self::popIDs($this->oas[self::cooBas]['keypairMeta'], 'keypair');
+			}
+			
 			$this->oas = kwam($this->oas, $a);
 			kwynn();
 		}
@@ -125,12 +125,20 @@ class enc_cookies {
 		
 	}
 
+	private function setAllOnTok() {
+		isucookie::set();
+		
+		$this->setKeyOb();
+		$this->puk10();
+		$this->renewCookie();		
+	}
+	
     public function enc($ptok, $eh) { 
 		
 		$this->emailHash = $eh;
 		
-		$this->puk10($eh);
-		 
+		$this->setAllOnTok();
+
 		$dk = kwifs($this, 'oas', self::cooBas, self::eknm);  kwas($dk, 'dec key should be set');
 	
 		$this->oas[self::cooBas][$this->goonm] = $ptok;
@@ -157,13 +165,12 @@ class enc_cookies {
 		if (kwifs($this, 'oas', self::cooBas)) {
 			return;
 		}
-		
+		$this->puk10();
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;
 		self::popIDs($a, 'baseCookie');
 		$this->oas[self::cooBas] = $a;
-		$this->renewCookie();
 	}
 	
 	public static function popIDs(array &$a, $nm) {
@@ -179,7 +186,10 @@ class enc_cookies {
 	}
 
 	private function renewPrivCoo() {
-		foreach([self::cooPub, self::cooPri] as $f) if ($a = kwifs($this, 'oas', $f)) kwscookie($f, json_encode($a), isucookie::getOpts());					
+		foreach([self::cooPub, self::cooPri] as $f) {
+			$a = kwifs($this, 'oas', $f);
+			kwscookie($f, json_encode($a), isucookie::getOpts());					
+		}
 	}
 
 	private function renewBaseCoo() {
@@ -196,8 +206,6 @@ class enc_cookies {
 
 	public function emailHash($t) {
 		if (!$t) return false;
-		$this->renewCookie();
-		isucookie::set();
 		for ($i=0; $i < 2806; $i++) $t = crypt($t, 'apIpUIgaIsuu5y3kqiAXVBdiTGclx2');
 		return $t;
 	}
