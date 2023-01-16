@@ -152,8 +152,8 @@ class enc_cookies {
 		foreach($a as $r) {
 			kwas($r['addr'] === $this->emailHash, 'email hashes do not match - pub key enc'); // sanity check
 			openssl_public_encrypt($sk,  $cit, $po);
-			$ret[$r['_id']][self::skf] = base64_encode($cit); unset($cit);
-			$ret[$r['_id']][self::gtcollid] = $this->oas[self::cooBas]['_id'];
+			$ret[$r['_id']][dao_plain::skf] = base64_encode($cit); unset($cit);
+			$ret[$r['_id']][dao_plain::gtcollid] = $this->oas[self::cooBas]['_id'];
 			continue;
 		}
 		

@@ -111,9 +111,9 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	   return false; 
    }
  
-   private function freshOrCanRefresh($tin) : bool {
+   private function freshOrCanRefresh($tin, $testing) : bool {
 	   
-	   if ($this->isActiveAT($tin))		  return true;
+	   if (!$testing && $this->isActiveAT($tin))		  return true;
 	   if (isset( $tin['refresh_token'])) return true;
 	   return false;
 
@@ -126,14 +126,14 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		
 		$rest1 = $this->tcoll->findOne(['_id' => $id], ['sort' => [self::tfnm . '.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
-		if (time() > strtotime('2023-01-16 00:25') && $this->freshOrCanRefresh($t)) return $t;
+		if ($this->freshOrCanRefresh($t, time() < strtotime('2023-01-16 01:35'))) return $t;
 		
 		return $this->getPeerToken($id);		
     }
     
 	private function getPeerToken(string $_id) : array {
-		// NOTE ****!!!! if you "turn off" the _id in projection, you can't match it!!!
-		$r = $this->pcoll->findOne(['_id' => $_id], ['projection' => ['_id' => 1, dao::gtcollid => 1, dao::skf => 1]]); unset($r['_id']);
+		
+		$r = $this->pcoll->findOne(['_id' => $_id],  ['projection' => ['_id' => true, dao::gtcollid => true, dao::skf => true]]);
 		$skf = kwifs($r, dao::skf);
 		if (!$skf) return [];
 		$p = $this->tcoll->findOne(['_id' => $skf]);
