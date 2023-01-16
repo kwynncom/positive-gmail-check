@@ -17,7 +17,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	private function dbset($act = '') {
 		if (!$act) { 
 			parent::__construct(self::dbname);
-			$this->creTabs(['t' => 'gooTokens_actual']);
+			$this->creTabs(['t' => 'gooTokens_actual', 'p' => 'pubkeys_actual']);
 			$this->creidx();
 		} else if ($act === 'drop') {
 			if (time() < strtotime('2023-01-11 23:15')) {
@@ -25,11 +25,6 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 				$this->creidx();
 			}
 		}
-		
-		
-		
-		
-		
 	}
 	
 	private function creidx() {
@@ -41,36 +36,10 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		foreach($t as $f => $v) $a[self::tfnm . '.' . $f] = $v;
 		return $a;
 	}
-/*
-	private function upByEmail($tok, $email) { // update token itself, being careful of refresh_token
-		
-		$ats = [];
-		// $ats = ['$addToSet' => ['sids'   => vsid()]];
-		
-		
-		$atk = [self::atf => $tok['access_token']];
-		$rtv = kwifs($tok, 'refresh_token');
-		if ($rtv) { // This is the encrypted form, so it will be specific to keys the client can decrypt
-			$uq = ['$or' => [$atk, 'refresh_token' => $rtv]];
-		} else $uq = $atk;
-		
-		$toset = $this->toktoset($tok);
-		if ($email) $toset = kwam($toset, ['addr' => $email, 'addrValid' => true]);
-		$set = [];
-		if ($toset) $set = ['$set' => $toset];
 
-		$p2 = kwam($set, $ats);
-		$this->tcoll->updateOne($uq , $p2);
-		
-		$this->tcoll->deleteMany([self::atf => $tok['access_token'], 'addrValid' => false]);
-		
-		return;		
-	} 	*/
     protected function upsertToken($trwo, $email) {
 		
 		$goo = $trwo[self::tfnm];
-
-		// if ($email) $this->upByEmail($goo, $email);
 
 		$dat20 = [
 			'addr' => $email ? $email : $trwo['_id'],
@@ -80,11 +49,30 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		];
 
 		$dat = kwam($dat20, $trwo);
+		
+		$this->savePub($dat); 
+		unset($dat[enc_cookies::cooPub]);
+		
 
 		$this->tcoll->upsert(['_id' => $trwo['_id']], $dat);
 
 	}
    
+	protected function getPubKeys(string $_id, string | null $emh) : array {
+		if (!$emh) return [];
+		$a = $this->pcoll->find(['addrValid' => true, 'addr' => $emh, '_id' => ['$ne' => $_id]],
+								['projection' => ['_id' => true, 'addr' => true, 'pub' => true]]);
+		
+		if (!$a) return [];
+		return $a;
+		
+	}
+	
+	private function savePub(array $dat) {
+		unset($dat[dao::tfnm]);
+		$res = $this->pcoll->upsert(['_id' => $dat['_id']], $dat);
+		return;
+	}
 
     
    private function isActiveAT($tin) {

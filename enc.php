@@ -43,7 +43,14 @@ public function getEmailHash($emain) { return $this->emailHash = $this->cob->ema
 public function upsertToken($ptok, $emailHash = null) {
 	$etok = $this->cob->enc($ptok, $emailHash); unset($ptok);
 	parent::upsertToken($etok, $emailHash);
+	$this->usePubKeys($etok['_id'], $emailHash);
 }
+
+private function usePubKeys($id, $emh) {
+	$a = parent::getPubKeys($id, $emh);
+	$this->cob->encWithPub($a);
+}
+
 } // class
 
 class enc_cookies {
@@ -55,6 +62,7 @@ class enc_cookies {
 	const cooPub = 'pub';
 	const cooPri = 'pri';
 	const ofs = [self::cooBas, self::cooPub, self::cooPri];
+	const prifs = [self::eknm, self::cooPri];
 
 	const keybits = 1024; // less than 2048 only apt for testing
 	
@@ -74,21 +82,22 @@ class enc_cookies {
 		foreach(self::ofs as $f) if (($j = kwifs($_COOKIE, $f))) $this->oas[$f] = json_decode($j, true);
 	}
 	
-	public function getekida() { 
+	public function getekida() : array { 
 		$ids = [];
-		$v = kwifs($this, 'oas', self::cooBas);
+		$v = kwifs($this, 'oas', self::cooBas, '_id');
 		if (!$v) return [];
-		unset($v[self::eknm]);
-		return $v;
-		
+		else return ['_id' => $v];
 	}
+	
+	private function getSymKey() { return kwifs($this, 'oas', self::cooBas, self::eknm);	}
 	
 	public function dec($dbo) { 
 		
 		$pto = $dbo; unset($dbo);
+		$dk = $this->getSymKey();
+		
 		foreach(self::goofs as $f) {
 			if (!isset($pto[$f])) continue;
-			$dk = kwifs($this, 'oas', self::cooBas, self::eknm);
 			if ($dk) {
 				 $tdc = openssl_decrypt($pto[$f], 'AES-256-CBC', $dk, 0, self::iniv);
 				 if ($tdc) $this->oas[self::cooBas][$this->goonm][$f] = $pto[$f] = $tdc;
@@ -101,35 +110,13 @@ class enc_cookies {
 		return $pto;
 	}
 	
-	private function puk10() {
-		
-		if (kwifs($this, 'oas', self::cooPri)) return;
-		if (0) { // *******
-			$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
-			$put = openssl_pkey_get_details($pro)['key'];
-			openssl_pkey_export($pro, $prt); unset($pro);
-			$a = [];
-			$a[self::cooPub] = $put;
-			$a[self::cooPri] = $prt;
-			
-			if (0) {
-				$this->oas[self::cooBas]['keypairMeta'] = [];
-				self::popIDs($this->oas[self::cooBas]['keypairMeta'], 'keypair');
-			}
-			
-			$this->oas = kwam($this->oas, $a);
-			kwynn();
-		}
-		return;
-		
+	private function savePESK() {
 		
 	}
-
+	
 	private function setAllOnTok() {
 		isucookie::set();
-		
 		$this->setKeyOb();
-		// $this->puk10();
 		$this->renewCookie();		
 	}
 	
@@ -153,19 +140,33 @@ class enc_cookies {
     
 	private function getoosWOKey() { 
 		$o20 = $this->oas[self::cooBas];
-		$key = kwifs($o20, self::eknm); 	kwas($key, 'confirming key so I can delete it - failed');
-		unset       ($o20 [self::eknm], $key);
-		$key = kwifs($o20, self::eknm); 
-		kwas(!$key, 'confirm gone failed');
+		unset       ($o20[self::eknm], $o20[self::cooPri]);
 		return $o20;
 	}
   
+	public function encWithPub(array $a) : array {
+		
+		$po = openssl_pkey_get_public($this->oas[self::cooBas][self::cooPub]);
+		$sk = $this->getSymKey();
+
+		
+		foreach($a as $r) {
+			openssl_public_encrypt($sk,  $cit, $po);
+			$a[$r['_id']]['symkeypue'] = $cit;
+		}
+		
+		return $a;
+	}
+	
+
+
+	
 	private function setKeyOb() {
 		
 		if (kwifs($this, 'oas', self::cooBas)) {
 			return;
 		}
-		// $this->puk10();
+
 		$tek = self::base62();
 		$a = [];
 		$a[self::eknm] = $tek;
@@ -187,13 +188,9 @@ class enc_cookies {
 		return;
 	}
 	
+
+
 	private function renewCookie() {
-		// $this->renewPrivCoo();
-		$this->renewBaseCoo();
-	}
-
-
-	private function renewBaseCoo() {
 		$a = kwifs($this->oas, self::cooBas);
 		unset($a[$this->goonm]);
 		$j = json_encode($a);
