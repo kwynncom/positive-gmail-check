@@ -20,6 +20,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 									['projection' => ['_id' => true, self::gtcollid => true, self::skf => true]]);
 		$tp = $this->tcoll->findOne(['_id' => kwifs($r, self::gtcollid)]);
 		if (!$tp) return [];
+		
+		$this->log->log('rt peer');
 		return [self::tfnm => $tp[self::tfnm], self::skf => $r[self::skf], 'peer' => true];
 		
 	}
@@ -125,9 +127,13 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 
     
    private function freshOrCanRefresh($tin, $testing) : bool {
+	   if (isset( $tin['refresh_token'])) {
+		   $this->log->log('rt me');
+		   return true;
+	   }
 	   
+	   // only need reversed logic for testing - that is, I was testing with the rt below the at check
 	   if (!$testing && GooOAUTHWrapper::accessTokenHasTimeRemaining($tin))  return true;
-	   if (isset( $tin['refresh_token'])) return true;
 	   return false;
    }
    
@@ -139,7 +145,6 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$rest1 = $this->tcoll->findOne(['_id' => $id], ['sort' => [self::tfnm . '.created' => -1]]);
 		$t = kwifs($rest1, self::tfnm);
 		if ($this->freshOrCanRefresh($t, time() < strtotime('2023-01-16 05:30'))) return $t;
-		
 		// return [];
 		return $this->getPeerToken($id);		 // ***** almost working
     }

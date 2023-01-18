@@ -11,7 +11,7 @@ class OAuthLog {
 		if ($ty === 'atsec') {
 			$sec = $sin;
 			$d   = sprintf('%0.2f', $sec / 60);
-			$sin = 'atMin=' . $d . '.';
+			$sin = 'ATm=' . $d . '.';
 		}
 				
 		$sin = ucfirst($sin);
