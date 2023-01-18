@@ -124,20 +124,11 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	}
 
     
-   private function isActiveAT($tin) {
-	   $fs = ['access_token', 'created', 'expires_in'];
-	   foreach($fs as $f) if (!isset($tin[$f]))  return false;
-	   $d = time() - ($tin['created'] + $tin['expires_in']); 
-	   if ($d <= 0) return true;
-	   return false; 
-   }
- 
    private function freshOrCanRefresh($tin, $testing) : bool {
 	   
-	   if (!$testing && $this->isActiveAT($tin))		  return true;
+	   if (!$testing && GooOAUTHWrapper::accessTokenHasTimeRemaining($tin))  return true;
 	   if (isset( $tin['refresh_token'])) return true;
 	   return false;
-
    }
    
     protected function getTokenDBO(array $ido) : array {

@@ -55,6 +55,7 @@ class positiveEmailCl extends GooOAuthWrapper {
 			$this->gmc->checkEmail();
 			$this->ulo->setEmail ($this->emailHash);
 			$this->regUsage($this->emailHash);
+			$this->log->log(GooOAUTHWrapper::accessTokenTimeRemainingS($this->client->getAccessToken()), 'atsec');
 		} 
 		catch(Exception $exv) {
 			if ($exv->getCode() === 401) return $this->doOAuth();

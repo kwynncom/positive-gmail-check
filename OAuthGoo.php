@@ -10,6 +10,25 @@ class GooOAUTHWrapper {
 	
 	protected readonly string $urlbase;
 	
+	public static function accessTokenTimeRemainingS(array | null | false $tin) : int { 
+		if (!$tin || !is_array($tin)) return false;
+		return $tin['created'] + $tin['expires_in'] - time(); 	
+	}
+	
+	public static function accessTokenHasTimeRemaining(array | null | false $tin) : bool {
+	   if (!$tin || !is_array($tin)) return false;
+	   $d = self::accessTokenTimeRemainingS($tin);
+	   if ($d >= 0) return true;
+	   return false; 		
+	}
+	
+	private static function vaft(array | null | false $tin) { // validate array for time; is this needed?
+	   if (!$tin || !is_array($tin)) return false;
+	   $fs = ['access_token', 'created', 'expires_in'];
+	   foreach($fs as $f) if (!isset($tin[$f]))  return false;
+	   return true;
+	}
+	
     private function setSpecificConfig() {
 		if (!($sn = kwifs($_SERVER, 'SERVER_NAME'))) $sn = 'example.com';
 		$this->urlbase = $oarurl = 'https://' .		 $sn .  $this->thea['upath'];
