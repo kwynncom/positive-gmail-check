@@ -1,7 +1,7 @@
 Be very careful of reproducing the peer key scenario.
 
 Remember that I don't receive cookies with Strict set upon "code" / init, pre-token code.  I don't have it before the email address is known or 
-after.
+after. [or do I, given that I've been redirecting for a while??]
 
 Does a redirect to "Actual" solve several problems?  What I just put in .htaccess?
 	Yes, it does seem to solve several problems, or maybe.

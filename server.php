@@ -33,6 +33,8 @@ class pemsDoit {
 			$msgtxt = $gdo->getText();
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
 		} catch (Exception $exv) { }
+		
+		if ($gdo) $logs = $gdo->getLog();
 
 		$ulo = $gdo ? $gdo->getLimitsO() : new usageLimit();
 		

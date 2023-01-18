@@ -123,7 +123,8 @@ class kwpemck {
 		inht('msgtxt', res.msgtxt);
 		inht('usage' , res.glt);
 		inht('dates' , res.dates);
-
+		inht('logs'  , res.logs);
+		
 		this.doerr(res.emsg);
 	 }
 
@@ -136,9 +137,12 @@ class kwpemck {
 		else      byid('errparent').style.display = 'none';  
 	}	
 
-	 usageExpandF() {
-		byid('usage'      ).style.visibility = 'visible';
-		byid('usageExpand').style.visibility = 'hidden';
+	 hiddenExpandF() {
+		qsa('[data-hbd="1"]').forEach((e) => { 
+			e.style.visibility = 'visible'; 
+			e.style.display = 'block'; 
+		});
+    	byid('hiddenExpand').style.visibility = 'hidden';
 		byid('revokeBtn1' ).style.display = 'block';
 	}
 
@@ -159,7 +163,7 @@ class kwpemck {
 </head>
 <body>
 	
-	<!-- <div>version ck 02:43</div> -->
+	<div style='margin-bottom: 3ex; '>
 	
 	<div id='errparent' style='display: none'>
 		<p id='errmsg'></p>
@@ -172,22 +176,30 @@ class kwpemck {
 			<div class='btn'><button  class='btn' onclick='KWPGO.pemckpost();' id='redoBtn'>redo</button></div>
 		</div>
 		<p id='dates'></p>
+
 	</div>
 
-	<p class='usageExpand'><span id='usageExpand' onclick='KWPGO.usageExpandF();'>+</span>
-		<span id='usage' style='visibility: hidden'></span>
-	</p>
+	<div class='hiddenExpand'><span id='hiddenExpand' onclick='KWPGO.hiddenExpandF();'>+</span>
+		<div style='visibility: hidden' data-hbd='1'>
+		<p id='usage' ></p>
+		<p id='logs'></p>
+		</div>
+	</div>
 
-	<div>
-		<button id='revokeBtn1' style='display: none; margin-top: 4ex' onclick='KWPGO.confirmRevoke();'>revoke access</button>
 
-		<div style='display: none; ' id='confirmRevokeDiv'>    
-			<div><label>Revoke Access - You Sure?</label></div>
-			<div style='margin-top: 2ex'>
+	
+	<div data-hbd='1' style='display: none'>
+		<div >
+			<button id='revokeBtn1' style='display: inline-block; margin-top: 4ex' onclick='KWPGO.confirmRevoke();'>revoke / refresh access</button>
+		</div>
+		<div style='display: none' id='confirmRevokeDiv'>    
+			<div style='display: block'><label>Revoke Access - You Sure?</label></div>
+			<div style='margin-top: 2ex; display: block; '>
 				<button id='revokeBtnN'  onclick='KWPGO.noRevoke();' style='display: block; margin-bottom: 9ex'>No</button>
 				<button id='revokeBtnY'  onclick='KWPGO.pemckpost("revoke");' style='display: block'>Yes</button>
 			</div>
 		</div>
+	</div>
 	</div>
 	<p><a href='/'>home</a> <a href='/t/6/07/ql/quick_links.html' style='padding-left: 10vw; '>ql</a></p>
 </body>

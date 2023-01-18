@@ -30,11 +30,11 @@ public function getTokenDB() {
 
 	$datok = kwifs($dtok, 'access_token');
 	if (!$datok) {
-		$this->log->log('no at db');
+		// $this->log->log('no at fr db');
 		return false; // if decryption key is lost; do I need to delete stuff, too??? 
 	}
 	if (isset($dtok['refresh_token'])) { // if can't decrypt key name (enc key object key) needs to not exist
-		$this->log->log('yes rt db');
+		// $this->log->log('rt fr db');
 	} 
 
 	return $dtok;

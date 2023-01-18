@@ -59,8 +59,8 @@ class GooOAUTHWrapper {
 	protected function getSavedToken() { return false; }
 	
 	private function logdbr($t) {
-		if		(isset($t['refresh_token'])) $this->log('rt in db');
-		else if (isset($t['access_token' ])) $this->log('at in db');
+		if		(isset($t['refresh_token'])) $this->log('rt fr db');
+		else if (isset($t['access_token' ])) $this->log('at fr db');
 	}
 	
     private function setToken() {
