@@ -15,8 +15,8 @@ class daoUsage extends dao_generic_3 implements qemconfig {
     }
 	
 	private function clean() {
-		$this->ucoll->createIndex(['U' => 1 /* should be 1 because we're looking to start with oldest */]);
-		$this->ucoll->deleteMany (['U' => ['$lt' => time() - self::keepUsageS]]);
+		$inres = $this->ucoll->createIndex(['U' => 1 /* should be 1 because we're looking to start with oldest */]);
+		$dres  = $this->ucoll->deleteMany (['U' => ['$lt' => time() - self::keepUsageS]]);
 	}
 	
 	public static function hasEmailSid(string $e) : bool { // email hash, actually
@@ -25,8 +25,8 @@ class daoUsage extends dao_generic_3 implements qemconfig {
 	}
 	
 	public function hasSIDbyEmailOb(string $e) : bool {
-		$this->ucoll->createIndex(	 ['sid' => 1,		  'email' =>  1, 'type' => 1]);
-		$res = $this->ucoll->findOne(['sid' => pemhsid(), 'email' => $e, 'type' => 'checked']);
+		$inres = $this->ucoll->createIndex(	 ['sid' => 1,		  'email' =>  1, 'type' => 1]);
+		$res = $this->ucoll->findOne(['sid' => pemhsid(false), 'email' => $e, 'type' => 'checked']);
 		return $res ? true : false;
 	}
     

@@ -1,6 +1,6 @@
 <?php
 
-function pemhsid() : string { return enc_cookies::pemhsid(); } 
+function pemhsid(bool $start = true) : string { return enc_cookies::pemhsid($start); } 
 
 class enc_cookies {
     //            1234567890123456 - 16 chars
@@ -16,7 +16,10 @@ class enc_cookies {
 	const keybits  = dao_plain::keybits ; 
 	const keybitsf = dao_plain::keybitsf;
 	
-	public static function pemhsid() : string { return hash('sha256', startSSLSession()); }
+	public static function pemhsid(bool $start = true) : string { 
+		$sid = $start ? startSSLSession() : contSSLSession();
+		return hash('sha256', $sid); 
+	}
 	
 	public static function forceExpire() {
 		if (isset($_COOKIE[self::cooBas])) kwscookie(self::cooBas, false, false);
