@@ -8,6 +8,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 	const atf  =  self::tfnm . '.' . 'access_token';
 	const skf = 'symkeypue';
 	const gtcollid = 'tokDocID';
+	const keybits  = 2048; // less than 2048 only apt for testing
+	const keybitsf = 'private_key_bits'; // NOT arbitrary name; based on PHP built-in func
 	
 	public static function test() {
 		cliOrDie();
@@ -50,6 +52,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 				$this->creidx();
 			}
 		}
+		
+		$this->policeBits();
 	}
 	
 	private function creidx() {
@@ -104,11 +108,21 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		}
 		
 	}
+	
+	private function policeBits() {
+		$q10 = [self::keybitsf => ['$lt' => self::keybits]];
+		$q20 = [self::keybitsf => ['$exists' => false]];
+		$q30 = ['$or' => [$q10, $q20]];
+		
+		$df = $this->pcoll->deleteMany($q30);
+		return;
+	}
    
 	protected function getPubKeys(bool $isrt, int $cre, string $_id, string | null $emh) : array {
 		if (!$emh) return [];
 		
 		if (!$isrt) return [];
+		
 		$q10 = ['addrValid' => true, 'addr' => $emh, '_id' => ['$ne' => $_id]];
 		
 		$a = $this->pcoll->find($q10,

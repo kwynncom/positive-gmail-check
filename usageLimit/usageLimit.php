@@ -14,9 +14,9 @@ class usageLimit {
 
 		startSSLSession();
 
-		$lim[] = ['type' => 'checked', 'limits' => [86400 => 175, 3600 => 45, 60 => 8, 5 => 1]];
-		$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
-		$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  20, 3600 =>  6, 60 => 3, 5 => 1]];
+		$lim[] = ['type' => 'checked', 'limits' => [86400 => 250, 3600 => 55, 60 => 8, 5 => 1]];
+		$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  50, 3600 => 15, 60 => 3, 5 => 1]];
+		$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  50, 3600 => 15, 60 => 3, 5 => 1]];
 
 		$this->lim = $lim;
 

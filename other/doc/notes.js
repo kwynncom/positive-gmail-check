@@ -1,3 +1,13 @@
+db.getCollection('pubkeys_actual').aggregate( [
+    {
+      $project: {
+           "length": { $strLenBytes: "$pub" }
+      }
+    }
+  ]); /* 272 === 1024 bits; 451 === 2048 bits */
+  
+  printjson(db.getCollection('usage').distinct('email'));
+
 /*2022/04/17
 
 * check for CONTINUING session

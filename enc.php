@@ -71,7 +71,8 @@ class enc_cookies {
 	const ofs = [self::cooBas, self::cooPub, self::cooPri];
 	const prifs = [self::eknm, self::cooPri];
 
-	const keybits = 1024; // less than 2048 only apt for testing
+	const keybits  = dao_plain::keybits ; 
+	const keybitsf = dao_plain::keybitsf;
 	
 	public static function forceExpire() {
 		if (isset($_COOKIE[self::cooBas])) kwscookie(self::cooBas, false, false);
@@ -193,7 +194,9 @@ class enc_cookies {
 		$a = [];
 		$a[self::eknm] = $tek;
 		
-		$pro = openssl_pkey_new(['private_key_bits' => self::keybits]);
+		$ba = [self::keybitsf => self::keybits];
+		$a = kwam($a, $ba);
+		$pro = openssl_pkey_new($ba);
 		$put = openssl_pkey_get_details($pro)['key'];
 		openssl_pkey_export($pro, $prt); unset($pro);
 		$a[self::cooPub] = $put;
