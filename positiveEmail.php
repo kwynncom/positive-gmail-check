@@ -2,7 +2,7 @@
 
 require_once('OAuthGoo.php');
 require_once('isUserCookie.php');
-require_once('enc.php');
+require_once('daoEnc.php');
 require_once('gmailGet.php');
 require_once('usageLimit/usageLimit.php');
 

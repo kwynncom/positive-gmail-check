@@ -4,14 +4,31 @@
 require_once(__DIR__ . '/../configDB.php');
 
 class daoUsage extends dao_generic_3 implements qemconfig {
-    
-    private $iid = null;
+	
+	const keepUsageDays = 45;
+	const keepUsageS    = self::keepUsageDays * DAY_S;
     
     function __construct() {
 		parent::__construct(qemconfig::dbname);
 		$this->creTabs('usage');
-		$this->ucoll->deleteMany(['U' => ['$lt' => time() - 86400 * 30]]);
+		$this->clean();
     }
+	
+	private function clean() {
+		$this->ucoll->createIndex(['U' => 1 /* should be 1 because we're looking to start with oldest */]);
+		$this->ucoll->deleteMany (['U' => ['$lt' => time() - self::keepUsageS]]);
+	}
+	
+	public static function hasEmailSid(string $e) : bool { // email hash, actually
+		$o = new self();
+		return $o->hasSidByEmailOb($e);
+	}
+	
+	public function hasSIDbyEmailOb(string $e) : bool {
+		$this->ucoll->createIndex(	 ['sid' => 1,		  'email' =>  1, 'type' => 1]);
+		$res = $this->ucoll->findOne(['sid' => pemhsid(), 'email' => $e, 'type' => 'checked']);
+		return $res ? true : false;
+	}
     
     private function setIID($res) { $this->iid = $res->getInsertedId();  }
     

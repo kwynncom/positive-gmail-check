@@ -1,64 +1,6 @@
 <?php
 
-require_once('dao.php');
-
-class dao extends dao_plain {
-	
-public function __construct($logo) {
-	$this->log = $logo;
-	parent::__construct();
-	$this->cob = new enc_cookies(self::tfnm);
-}
-
-public function deleteTokenKwDB($ignore = null) {
-	parent::deleteTokenKwDB($this->cob->getekida());
-}
-
-public function getTokenDB() {
-	
-	$etok  = parent::getTokenDBO($this->cob->getekida());
-	if (!$etok) return false;
-	
-	$sk = '';
-	if (kwifs($etok, 'peer')) {
-		$sk = $etok[self::skf]; 
-		$etok = $etok[self::tfnm];
-	}
-		
-	
-	$dtok = $this->cob->dec($etok, $sk);
-
-	$datok = kwifs($dtok, 'access_token');
-	if (!$datok) {
-		// $this->log->log('no at fr db');
-		return false; // if decryption key is lost; do I need to delete stuff, too??? 
-	}
-	if (isset($dtok['refresh_token'])) { // if can't decrypt key name (enc key object key) needs to not exist
-		// $this->log->log('rt fr db');
-	} 
-
-	return $dtok;
-}
-
-public static function expireCookies() {
-	enc_cookies::forceExpire();
-}
-
-public function getEmailHash($emain) { return $this->emailHash = $this->cob->emailHash($emain); }
-
-public function upsertToken($ptok, $emailHash = null) {
-	$etok = $this->cob->enc($ptok, $emailHash); unset($ptok);
-	parent::upsertToken($etok, $emailHash);
-	if (!$emailHash) return;
-	$this->usePubKeys(isset($etok[self::tfnm]['refresh_token']), $etok[self::tfnm]['created'], $etok['_id'], $emailHash);
-}
-
-private function usePubKeys(bool $isrt, int $cre, string $id, string $emh) {
-	$a = parent::getPubKeys(     $isrt,     $cre,        $id,	     $emh);
-	parent::updatePubsWithSym($this->cob->encWithPub($a));
-}
-
-} // class
+function pemhsid() : string { return enc_cookies::pemhsid(); } 
 
 class enc_cookies {
     //            1234567890123456 - 16 chars
@@ -73,6 +15,8 @@ class enc_cookies {
 
 	const keybits  = dao_plain::keybits ; 
 	const keybitsf = dao_plain::keybitsf;
+	
+	public static function pemhsid() : string { return hash('sha256', startSSLSession()); }
 	
 	public static function forceExpire() {
 		if (isset($_COOKIE[self::cooBas])) kwscookie(self::cooBas, false, false);
@@ -227,10 +171,10 @@ class enc_cookies {
 		return base62::get($len);
     }
 
-	public function emailHash($t) {
-		if (!$t) return false;
+	public static function emailHashF(string $t) {
 		for ($i=0; $i < 2806; $i++) $t = crypt($t, 'apIpUIgaIsuu5y3kqiAXVBdiTGclx2');
 		return $t;
 	}
 	
 }
+

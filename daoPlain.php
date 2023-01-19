@@ -83,7 +83,7 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 			'addr' => $email ? $email : $trwo['_id'],
 			'addrValid' => $email ? true : false,
 			'created_tok' => date('r', $goo['created']),
-			// 'sids' => [vsid()],
+			// 'sids' => [hashSessionIDNotRealName()],
 		];
 
 		self::ssdwp($dat20, 'privowner');
