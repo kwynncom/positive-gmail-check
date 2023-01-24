@@ -9,18 +9,27 @@ class GooOAUTHWrapper {
 	const tnms = ['refresh_token', 'access_token'];
 	
 	protected readonly string $urlbase;
+
+	// PUBLIC FUNCTIONS BEGIN *******
+    public function getOAuthURL() : string { // call after instantiation to see if you need to redirect to Goo for OAUTH
+		if (isset  ($this->oauthurl)) 
+			 return $this->oauthurl;
+		else return '';
+    }
+
+	public function revokeToken() : bool {	return $this->client->revokeToken();  } // returns revokaction success or failure (based on HTTP 200 or not)
 	
 	public static function accessTokenTimeRemainingS(array | null | false $tin) : int { 
-		if (!$tin || !is_array($tin)) return false;
+		if (!$tin || !is_array($tin)) return -1;
 		return $tin['created'] + $tin['expires_in'] - time(); 	
 	}
 	
 	public static function accessTokenHasTimeRemaining(array | null | false $tin) : bool {
 	   if (!$tin || !is_array($tin)) return false;
 	   $d = self::accessTokenTimeRemainingS($tin);
-	   if ($d >= 0) return true;
-	   return false; 		
+	   return $d > 0;
 	}
+	// PUBLIC END ****
 	
 	private static function vaft(array | null | false $tin) { // validate array for time; is this needed?
 	   if (!$tin || !is_array($tin)) return false;
@@ -39,24 +48,7 @@ class GooOAUTHWrapper {
 		$this->specSettings = $set;
     }
 
-	public function saveToken($din) {
-		
-		if (false) { 
-			$a = $this->thea;
-			$f = $a['sfb'] . $a['osfx'] . $a['sfx'];
-			file_put_contents($f, json_encode($din, JSON_PRETTY_PRINT));	
-		}
-	}
-	
-	function __destruct() {
-		if (!isset($this->client)) return;
-		// **** $this->saveToken($this->client->getAccessToken()); ****
-	}
-
-	function __construct($cdin) {
-		
-		$this->logs = '';
-		
+	function __construct(array $cdin) {
 		$this->thea = $cdin;
 		$this->setSpecificConfig();
 		$client = new Google_Client();
@@ -70,12 +62,9 @@ class GooOAUTHWrapper {
 		$this->setToken();
     }
     
-    public function getGoogleClient() { return $this->client; }
+    protected function getGoogleClient() { return $this->client; }
     
-    public function revokeToken() {	
-		return $this->client->revokeToken(); /* returns boolean true on success */    }
-    
-	protected function getSavedToken() { return false; }
+	protected function getSavedToken() { return false; } // create a child function!
 	
 	private function logdbr($t) {
 		if		(isset($t['refresh_token'])) $this->log('rt fr db');
@@ -113,11 +102,6 @@ class GooOAUTHWrapper {
 		return $this->initTokenSet;
     }
     
-	public function initTokenStatus() {
-		if (isset($this->initTokenSet)) return $this->initTokenSet;
-		else return false;
-	}
-	
     private static function getOAuthCode() {
 		if (!isset($_REQUEST['code'])) return false;
 		return     $_REQUEST['code'];
@@ -126,39 +110,35 @@ class GooOAUTHWrapper {
 	private function deleteToken() {}
 	
 	private function log($sin) {
-		$this->log->log($sin);
+		static $lfinit = false;
+		static $lf = false;
+		
+		if (!$lfinit) $lf = kwifs($this, 'log', 'log');
+		
+		if ($lf) $lf($sin);
 	}
 
     private function processAuthCode() {
 		
 		if (!($code = $this->getOAuthCode())) return false;
 		
-		$this->doUponOAInitCode();
+		if (method_exists($this, 'doUponOAInitCode')) $this->doUponOAInitCode();
 		
 		$this->log('nonce code');
         
 		$res = $this->client->authenticate($code);
 		$this->deleteToken();
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
-		$this->doUponAuth();
+		$this->receiveRefreshToken($this->client->getAccessToken());
 
 		exit(0); // maybe a good idea
     }
     
-    public function doOAuth() {
+    protected function doOAuth() {
 		$this->deleteToken();
 		$this->processAuthCode();
 		$this->client->setRedirectUri($this->urlbase . $this->thea['redbase']);
 		$auth_url = $this->client->createAuthUrl();
 		$this->oauthurl = $auth_url;
     }
-  
-	public function forceGetOAuthURL() { return $this->client->createAuthUrl();	}
-	
-    public function getOAuthURL() {
-		if (isset  ($this->oauthurl)) 
-			 return $this->oauthurl;
-		else return false;
-    }
-
 }

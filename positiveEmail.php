@@ -1,12 +1,12 @@
 <?php
 
-require_once('OAuthGoo.php');
+require_once('OAuthGooOuter.php');
 require_once('isUserCookie.php');
 require_once('daoEnc.php');
 require_once('gmailGet.php');
 require_once('usageLimit/usageLimit.php');
 
-class positiveEmailCl extends GooOAuthWrapper {
+class positiveEmailCl extends GooOAuthWrapperOuter {
 	
 	const peoaa = [
 					'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
@@ -17,11 +17,8 @@ class positiveEmailCl extends GooOAuthWrapper {
 					'redbase' => 'receiveAuthCode.php',
 				];
 	
-	const srvFile = 'server.php';
-	const srvPath = self::peoaa['upath'] . '/' . self::srvFile;
-	
-	protected OAuthLog		$log;
-	private   usageLimit	$ulo;
+	protected OAuthLog	   $log;
+	private   usageLimit   $ulo;
 
 	public function __construct(usageLimit $ulo = null) { 
 		
@@ -35,12 +32,11 @@ class positiveEmailCl extends GooOAuthWrapper {
 	}
 	
 	protected function doUponOAInitCode() { $this->ulo->putUse('oauth');	}
-
 	
 	private function setEmailSpecificStuff() {
-		$this->gmc = new gmailGetCl($this->getGoogleClient());
-		$this->emailAddress = $this->gmc->getEmailAddress();
-		$this->emailHash    = $this->dao->getEmailHash($this->emailAddress);		
+		parent::receiveRefreshToken($this->client->getAccessToken());
+		$this->gmc = $this->getGmailClient();
+		$this->emailHash    = $this->dao->getEmailHash($this->emailAddressFromGoo);		
 	}
 	
 	public function getLog() { return $this->log->get(); }
@@ -72,21 +68,20 @@ class positiveEmailCl extends GooOAuthWrapper {
 		$this->dao->upsertToken($mt, $em);
 	}
 
-	public function doUponAuth() {
+	protected function receiveRefreshToken($atin) {
 		isucookie::set();
-		$mt = $this->client->getAccessToken();
-		$this->dao->upsertToken($mt); // this versus regUsage seems redundant but must be done this way
+		$this->dao->upsertToken($atin); // this versus regUsage seems redundant but must be done this way
 		$this->setEmailSpecificStuff();
-		$this->regUsage($this->emailHash, $mt);
+		$this->regUsage($this->emailHash, $atin);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
 	}
 	
-	public function revokeToken() {
+	public function revokeToken() : bool {
 		$this->ulo->putUse('revoke');
 		$rr = parent::revokeToken();
 		$this->deleteToken();
-		return;
+		return $rr;
     }
 
 	public function revokeAccess() {
@@ -97,7 +92,7 @@ class positiveEmailCl extends GooOAuthWrapper {
 		return $o->urlbase;
 	}
 	
-	public	  function deleteToken()   { $this->dao->deleteTokenKwDB();	}
-	protected function getSavedToken() { return $this->dao->getTokenDB();	}
-	private   function setDao()		   { $this->dao = new dao($this->log);		}
+	public	  function deleteToken()		   { $this->dao->deleteTokenKwDB();	}
+	protected function getSavedToken() : array { if ($r = $this->dao->getTokenDB()) return $r;	return [];	}
+	private   function setDao()				   { $this->dao = new dao($this->log);		}
 }

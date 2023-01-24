@@ -1,14 +1,17 @@
 <?php
 
 class gmailGetCl {
+	
+	public readonly string $emailAddressFromGooGmailClient;
     
     function __construct($googc) { // Goo general client
 		$this->serv  = $service = new Google_Service_Gmail($googc);
-		$this->email = $service->users->getProfile('me')->emailAddress;
+		$tem = $service->users->getProfile('me')->emailAddress;
+		if ($tem && is_string($tem)) $this->emailAddressFromGooGmailClient = $tem;
+		else						 $this->emailAddressFromGooGmailClient = '';
+		
     }
-    
-    public function getEmailAddress() { return kwifs($this, 'email'); }
-	
+  	
     public function checkEmail() { 
 		$this->goomlo = $this->serv->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' ));   }
     
