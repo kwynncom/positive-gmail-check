@@ -3,19 +3,12 @@
 require_once('OAuthGooOuter.php');
 require_once('isUserCookie.php');
 require_once('daoEnc.php');
-require_once('gmailGet.php');
 require_once('usageLimit/usageLimit.php');
+require_once('positiveEmailDefaults.php');
 
-class positiveEmailCl extends GooOAuthWrapperOuter {
+class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefaults {
 	
-	const peoaa = [
-					'sfb'  => '/var/kwynn/gooauth/positive_email_secret', 
-					'sfx' => '.json',
-					'scope' => Google_Service_Gmail::GMAIL_METADATA, 
-					'upath' => '/t/7/12/email/',
-					'osfx' => '_live_active_output',
-					'redbase' => 'receiveAuthCode.php',
-				];
+	const peoaa = positiveEmailDefaults::peoaa;
 	
 	protected OAuthLog	   $log;
 	private   usageLimit   $ulo;

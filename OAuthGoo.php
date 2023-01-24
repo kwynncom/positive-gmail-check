@@ -57,7 +57,7 @@ class GooOAUTHWrapper {
 		$client->setIncludeGrantedScopes(true);
 		$this->client = $client;
 
-		$this->processAuthCode(); 
+		if ($this->processAuthCode()) return; // if success, continuing results in a loop
 		$this->client->setScopes($this->thea['scope']);
 		$this->setToken();
     }
@@ -131,7 +131,7 @@ class GooOAUTHWrapper {
 		if (kwifs($res, 'error')) kwas(false, json_encode($res));
 		$this->receiveRefreshToken($this->client->getAccessToken());
 
-		exit(0); // maybe a good idea
+		return true; // don't need an exit() but do need to be careful
     }
     
     protected function doOAuth() {
