@@ -2,10 +2,15 @@
 
 require_once('OAuthGoo.php');
 require_once('OAuthGooState.php');
+require_once('gmailGet.php');
 
 class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
-	public readonly string $emailAddressFromGooOauth2;
+	public readonly string $emailAddressFromGOW;
+	
+	public static function haveScope() {
+		
+	}
 	
 	public function __construct(array $config, string $requireOnceF = '') { 
 		$uq = '';
@@ -20,15 +25,15 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 		$this->setEmailAfterAuth();
 	}
 	
-	protected function setEmailAfterAuth() {
-		if (isset($this->emailAddressFromGooOauth2)) return;
-		$bs = $this->client->getScopes();
-		$this->client->setScopes(Google_Service_Oauth2::USERINFO_EMAIL);
+	protected function setEmailAfterAuth() : string {
+		if (isset($this->emailAddressFromGOW)) return $this->emailAddressFromGOW;
+		if ($e = gmailGetCl::getEmailAddress($this->client)) { $this->emailAddressFromGOW = $e; return $e; }
+		$ss =  $this->client->getScopes();
+		kwas(in_array(Google_Service_Oauth2::USERINFO_EMAIL, $ss), 'no way to set email address Goo out wrap');
 		$oa = new Google_Service_Oauth2($this->client);
-		$this->emailAddressFromGooOauth2 = $oa->userinfo->get()->email;
-		$this->client->setScopes($bs);
-	}
-
-}
+		$this->emailAddressFromGOW = $oa->userinfo->get()->email;
+		return $this->emailAddressFromGOW;
+	} // func
+} // class
 
 

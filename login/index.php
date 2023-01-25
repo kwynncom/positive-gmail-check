@@ -13,5 +13,5 @@ kwynn();
 if ($url) { header('Location: ' . $url); exit(0); }
 
 header('Content-Type: text/plain');
-echo('Logged in as ' . $goooa->emailAddressFromGooOauth2);
+echo('Logged in as ' . $goooa->emailAddressFromGOW);
 exit(0);

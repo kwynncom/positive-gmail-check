@@ -2,21 +2,28 @@
 
 class gmailGetCl {
 	
+	const emailAddressScopePrefix = 'https://www.googleapis.com/auth/gmail';	
 	public readonly string $emailAddressFromGmailClient;
 	
     private function __construct($googc, $setEmail = false) { // Goo general client
 		$this->goomlo = false;
 		$this->serv  = $service = new Google_Service_Gmail($googc);
-		if ($setEmail) {
-			$tem = $this->serv->users->getProfile('me')->emailAddress;
-			if ($tem && is_string($tem)) $this->emailAddressFromGmailClient = $tem;
-			else						 $this->emailAddressFromGmailClient = '';		
-		}
+		if ($setEmail) $this->emailAddressFromGmailClient = $this->serv->users->getProfile('me')->emailAddress;
+		
 	}
 	
-	public static function getEmail($goocl) {
+	public static function getEmailAddress($goocl) : string {
+		if (!self::canScopesGetEmail($goocl)) return '';
 		$o = new self($goocl, true);
 		return $o->emailAddressFromGmailClient;
+	}
+	
+	public static function canScopesGetEmail($gc) {
+		$ss = $gc->getScopes();
+		foreach($ss as $s) if (strpos($s, self::emailAddressScopePrefix) !== false) return true;
+		return false;
+		
+		
 	}
 	
 	private function checkEmail() { 
