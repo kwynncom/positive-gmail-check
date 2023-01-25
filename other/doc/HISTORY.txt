@@ -1,6 +1,0 @@
-2023/01/09
-
-Getting rid of FileToMongo stuff
-
-00:49 - I was using the URL to figure out which app I was running.  Vaguely clever, but I shouldn't need that again.
-01:03 - I have no idea what "sortURLs" was about.  Probably getting rid of it.

@@ -2,13 +2,20 @@
 
 require_once('OAuthGoo.php');
 require_once('gmailGet.php');
+require_once('OAuthGooState.php');
 
 class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
 	public readonly string $emailAddressFromGoo;
 	private $gmc;
 	
-	public function __construct(array $config) { parent::__construct($config); }
+	public function __construct(array $config, string $requireOnceF = '') { 
+		parent::__construct($config); 
+		if ($requireOnceF) {
+			$uq = GooOAuthState::set($requireOnceF);
+			$this->client->setState($uq);
+		}
+	}
 	
 	protected function getSavedToken() : array			 { return [];  } /* you probably want to define a child */
 	protected function receiveRefreshToken(array $token) { $this->setEmailAddress($token); }
@@ -17,7 +24,7 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 		$this->gmc = new gmailGetCl($this->getGoogleClient());
 		$this->emailAddressFromGoo = $this->gmc->emailAddressFromGooGmailClient;
 	}
-	
+
 	protected function getGmailClient() { return $this->gmc; }
 }
 

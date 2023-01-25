@@ -9,6 +9,7 @@ require_once('positiveEmailDefaults.php');
 class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefaults {
 	
 	const peoaa = positiveEmailDefaults::peoaa;
+	const runnerF = __DIR__ . '/positiveEmailRun.php';
 	
 	protected OAuthLog	   $log;
 	private   usageLimit   $ulo;
@@ -18,7 +19,7 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 		$this->ulo = $ulo ? $ulo : new usageLimit();
 		$this->log = new OAuthLog();
 		$this->setDao();
-		parent::__construct(self::peoaa);
+		parent::__construct(self::peoaa, self::runnerF);
 		if (isset($this->oauthurl)) return;
 		$this->setEmailSpecificStuff();
 

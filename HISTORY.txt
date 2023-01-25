@@ -1,0 +1,17 @@
+2023/01/24 19:26
+
+purging lots of files of notes, bug notes, etc.
+May rearrange stuff to separate Positive Email versus general functions.
+./doc/notes.js had a bunch of queries
+to do notes
+commands to set up secret file
+testIsKwGoo
+./other/arch/proj2 is being superceded as I generalize more. Now I'm generalizing to show a "Login with Goo" example.
+
+
+2023/01/09
+
+Getting rid of FileToMongo stuff
+
+00:49 - I was using the URL to figure out which app I was running.  Vaguely clever, but I shouldn't need that again.
+01:03 - I have no idea what "sortURLs" was about.  Probably getting rid of it.

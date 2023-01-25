@@ -1,9 +1,0 @@
-/var/kwynn/law$
-mkdir law
-cd law
-sudo chgrp www-data .
-chmod 770 .
-# download from Google Cloud Console
-mv ~/Downloads/client_secret_1234.json .
-chmod 440 *.json
-sudo chgrp www-data *.json

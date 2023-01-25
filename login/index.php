@@ -11,10 +11,3 @@ if ($url) { header('Location: ' . $url); exit(0); }
 
 header('Content-Type: text/plain');
 echo('Logged in as ' . $goooa->emailAddressFromGoo);
-
-
-
-
-
-
-
