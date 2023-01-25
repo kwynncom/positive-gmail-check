@@ -21,17 +21,10 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 		$this->setDao();
 		parent::__construct(self::peoaa, self::runnerF);
 		if (isset($this->oauthurl)) return;
-		$this->setEmailSpecificStuff();
-
+		$this->setEmailAfterAuth();
 	}
 	
 	protected function doUponOAInitCode() { $this->ulo->putUse('oauth');	}
-	
-	private function setEmailSpecificStuff() {
-		parent::receiveRefreshToken($this->client->getAccessToken());
-		$this->gmc = $this->getGmailClient();
-		$this->emailHash    = $this->dao->getEmailHash($this->emailAddressFromGoo);		
-	}
 	
 	public function getLog() { return $this->log->get(); }
 	
@@ -39,10 +32,10 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	
 	public function getLimitsO() { return $this->ulo; }
 	
-	public function checkEmail() {
+	public function getEmailCountTxt() {
 		try { 
 			$this->ulo->putUse('checked');
-			$this->gmc->checkEmail();
+			$cntt = gmailGetCl::getCountText($this->client);
 			$this->ulo->setEmail ($this->emailHash);
 			$this->regUsage($this->emailHash);
 			$this->log->log(GooOAUTHWrapper::accessTokenTimeRemainingS($this->client->getAccessToken()), 'atsec');
@@ -51,6 +44,8 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 			if ($exv->getCode() === 401) return $this->doOAuth();
 			else throw $exv;
 		}
+		
+		return $cntt;
 	}
 	
 	public function getText() { return $this->gmc->getText();	}
@@ -62,10 +57,15 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 		$this->dao->upsertToken($mt, $em);
 	}
 
+	protected function setEmailAfterAuth() {
+		parent::setEmailAfterAuth();
+		$this->emailHash    = $this->dao->getEmailHash($this->emailAddressFromGooOauth2);			
+	}
+	
 	protected function receiveRefreshToken($atin) {
 		isucookie::set();
 		$this->dao->upsertToken($atin); // this versus regUsage seems redundant but must be done this way
-		$this->setEmailSpecificStuff();
+		$this->setEmailAfterAuth();
 		$this->regUsage($this->emailHash, $atin);
 		header('Location: ' .  $this->urlbase . iaacl::getURLQ());
 		exit(0);
