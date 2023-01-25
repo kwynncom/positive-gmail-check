@@ -2,16 +2,30 @@
 
 class gmailGetCl {
 	
-    function __construct($googc) { // Goo general client
+	public readonly string $emailAddressFromGmailClient;
+	
+    private function __construct($googc, $setEmail = false) { // Goo general client
 		$this->goomlo = false;
 		$this->serv  = $service = new Google_Service_Gmail($googc);
-		$this->checkEmail();
-    }
-  	
-    private function checkEmail() { 
+		if ($setEmail) {
+			$tem = $this->serv->users->getProfile('me')->emailAddress;
+			if ($tem && is_string($tem)) $this->emailAddressFromGmailClient = $tem;
+			else						 $this->emailAddressFromGmailClient = '';		
+		}
+	}
+	
+	public static function getEmail($goocl) {
+		$o = new self($goocl, true);
+		return $o->emailAddressFromGmailClient;
+	}
+	
+	private function checkEmail() { 
 		$this->goomlo = $this->serv->users_messages->listUsersMessages('me', array('maxResults' => 10, 'labelIds' => 'UNREAD' ));   }
 		
-	public function getGoomlo() { return $this->goomlo; }
+	public function getGoomlo() { 
+		$this->checkEmail();
+		return $this->goomlo; 
+	}
     
     public static function getCountText($goocli) {
 		$so = new self($goocli); unset($goocli);

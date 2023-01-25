@@ -5,6 +5,7 @@ require_once('isUserCookie.php');
 require_once('daoEnc.php');
 require_once('usageLimit/usageLimit.php');
 require_once('positiveEmailDefaults.php');
+require_once('gmailGet.php');
 
 class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefaults {
 	
@@ -48,8 +49,6 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 		return $cntt;
 	}
 	
-	public function getText() { return $this->gmc->getText();	}
-	
 	public function regUsage(string $em, array $mtin = []) {
 		isucookie::set();
 		if ($mtin) $mt = $mtin;
@@ -58,8 +57,9 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	}
 
 	protected function setEmailAfterAuth() {
-		parent::setEmailAfterAuth();
-		$this->emailHash    = $this->dao->getEmailHash($this->emailAddressFromGooOauth2);			
+		// parent::setEmailAfterAuth();
+		$this->emailHash    = $this->dao->getEmailHash(gmailGetCl::getEmail($this->client));	
+		kwynn();		
 	}
 	
 	protected function receiveRefreshToken($atin) {

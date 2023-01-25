@@ -1,7 +1,6 @@
 <?php
 
 require_once('OAuthGoo.php');
-require_once('gmailGet.php');
 require_once('OAuthGooState.php');
 
 class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
