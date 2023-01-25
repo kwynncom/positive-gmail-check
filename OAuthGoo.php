@@ -48,7 +48,7 @@ class GooOAUTHWrapper {
 		$this->specSettings = $set;
     }
 
-	function __construct(array $cdin) {
+	function __construct(array $cdin, string $reqState = '') {
 		$this->thea = $cdin;
 		$this->setSpecificConfig();
 		$client = new Google_Client();
@@ -56,6 +56,8 @@ class GooOAUTHWrapper {
 		$client->setAccessType('offline');
 		$client->setIncludeGrantedScopes(true);
 		$this->client = $client;
+		if ($reqState) $this->client->setState($reqState);
+		
 
 		if ($this->processAuthCode()) return; // if success, continuing results in a loop
 		$this->client->setScopes($this->thea['scope']);

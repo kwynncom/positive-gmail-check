@@ -10,11 +10,11 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	private $gmc;
 	
 	public function __construct(array $config, string $requireOnceF = '') { 
-		parent::__construct($config); 
-		if ($requireOnceF) {
-			$uq = GooOAuthState::set($requireOnceF);
-			$this->client->setState($uq);
-		}
+		$uq = '';
+		if ($requireOnceF) $uq = GooOAuthState::set($requireOnceF);
+		parent::__construct($config, $uq); 
+		if ($uq) $this->client->setState($uq);
+		
 	}
 	
 	protected function getSavedToken() : array			 { return [];  } /* you probably want to define a child */

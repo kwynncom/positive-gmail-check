@@ -35,7 +35,7 @@ class GooOAuthState extends dao_generic_3 {
 	}
 	
 	private function doit20() {
-		$this->$_id = $_id = dao_generic_3::oidsvd(isrv('state'), true);
+		$_id = dao_generic_3::oidsvd(isrv('state'), true);
 		$r = $this->gcoll->findOne(['_id' => $_id]); 
 		kwas($r, 'no pending Goo OAUTH request found - perahps timed out?');
 		$f = $r['require_once'];
@@ -46,7 +46,7 @@ class GooOAuthState extends dao_generic_3 {
 	
 	private function do10() {
 		$dat = [];
-		$dat['_id'] = dao_generic_3::get_oids(true);
+		$this->_id = $dat['_id'] = dao_generic_3::get_oids(true);
 		$dat['require_once'] = $this->ofile;
 		$dat['U'] = $U = time();
 		$dat['r'] = date('r', $U);
