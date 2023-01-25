@@ -8,10 +8,6 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
 	public readonly string $emailAddressFromGOW;
 	
-	public static function haveScope() {
-		
-	}
-	
 	public function __construct(array $config, string $requireOnceF = '') { 
 		$uq = '';
 		if ($requireOnceF) $uq = GooOAuthState::set($requireOnceF);
@@ -27,13 +23,25 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
 	protected function setEmailAfterAuth() : string {
 		if (isset($this->emailAddressFromGOW)) return $this->emailAddressFromGOW;
-		if ($e = gmailGetCl::getEmailAddress($this->client)) { $this->emailAddressFromGOW = $e; return $e; }
-		$ss =  $this->client->getScopes();
-		kwas(in_array(Google_Service_Oauth2::USERINFO_EMAIL, $ss), 'no way to set email address Goo out wrap');
+		$tok = $this->client->getAccessToken();
+		$mys = $tok['scope']; unset($tok);
+		if ($emgm = $this->setEmailAddressFromGmail($mys)) return $emgm;
+		
+		kwas(strpos($mys, Google_Service_Oauth2::USERINFO_EMAIL) !== false, 'no way to set email address Goo out wrap');
 		$oa = new Google_Service_Oauth2($this->client);
 		$this->emailAddressFromGOW = $oa->userinfo->get()->email;
 		return $this->emailAddressFromGOW;
 	} // func
+	
+	private function setEmailAddressFromGmail(string $mys) : string {
+		if (strpos($mys, gmailGetCl::emailAddressScopePrefix) !== false) {
+			$e = gmailGetCl::getEmailAddress($this->client);
+			$this->emailAddressFromGOW = $e;
+			return $e;
+		}
+		return '';
+		
+	}
 } // class
 
 

@@ -13,17 +13,8 @@ class gmailGetCl {
 	}
 	
 	public static function getEmailAddress($goocl) : string {
-		if (!self::canScopesGetEmail($goocl)) return '';
 		$o = new self($goocl, true);
 		return $o->emailAddressFromGmailClient;
-	}
-	
-	public static function canScopesGetEmail($gc) {
-		$ss = $gc->getScopes();
-		foreach($ss as $s) if (strpos($s, self::emailAddressScopePrefix) !== false) return true;
-		return false;
-		
-		
 	}
 	
 	private function checkEmail() { 
