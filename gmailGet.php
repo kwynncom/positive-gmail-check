@@ -2,7 +2,7 @@
 
 class gmailGetCl {
 	
-	const emailAddressScopePrefix = 'https://www.googleapis.com/auth/gmail';	
+	const emailAddressScope = Google_Service_Gmail::GMAIL_METADATA; // GMail send may not work
 	public readonly string $emailAddressFromGmailClient;
 	
     private function __construct($googc, $setEmail = false) { // Goo general client

@@ -34,7 +34,7 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	} // func
 	
 	private function setEmailAddressFromGmail(string $mys) : string {
-		if (strpos($mys, gmailGetCl::emailAddressScopePrefix) !== false) {
+		if (strpos($mys, gmailGetCl::emailAddressScope) !== false) {
 			$e = gmailGetCl::getEmailAddress($this->client);
 			$this->emailAddressFromGOW = $e;
 			return $e;
