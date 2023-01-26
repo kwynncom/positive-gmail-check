@@ -9,7 +9,7 @@ class GooOAuthState extends dao_generic_3 {
 	const goostimeoutS = 1200;
 	
 	public static function set(string $reqOnce) {
-		// kwas(is_readable($reqOnce), "$reqOnce not a readable file");
+		kwas(is_readable($reqOnce), "$reqOnce not a readable file");
 		$o = new self($reqOnce);
 		return $o->getID();
 	}
@@ -39,14 +39,9 @@ class GooOAuthState extends dao_generic_3 {
 		$r = $this->gcoll->findOne(['_id' => $_id]); 
 		kwas($r, 'no pending Goo OAUTH request found - perahps timed out?');
 		$f = $r['require_once'];
-		if (strpos($f, 'http') !== 0) {
-			kwas(is_readable($f), "$f not readable");
-			require_once($f);
-		}
-		else {
-			header('Location: ' . $f);
-			exit(0);
-		}
+		kwas(is_readable($f), "$f not readable");
+		require_once($f);
+		return;
 		
 	}
 	
