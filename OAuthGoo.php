@@ -73,7 +73,7 @@ class GooOAUTHWrapper {
 		else if (isset($t['access_token' ])) $this->log('at fr db');
 	}
 	
-    private function setToken() {
+    protected function setToken() { // needs to be protected because children need to make sure it's a refreshed token
 		
 		$accessToken = $this->getSavedToken();
 		if (!$accessToken) {
