@@ -9,6 +9,8 @@ class GooOAUTHWrapper {
 	const tnms = ['refresh_token', 'access_token'];
 	
 	protected readonly string $urlbase;
+	
+	public readonly bool $okRevoke;
 
 	// PUBLIC FUNCTIONS BEGIN *******
     public function getOAuthURL() : string { // call after instantiation to see if you need to redirect to Goo for OAUTH
@@ -48,8 +50,9 @@ class GooOAUTHWrapper {
 		$this->specSettings = $set;
     }
 
-	function __construct(array $cdin, string $reqState = '') {
+	function __construct(array $cdin, string $reqState = '', bool $revoke = false) {
 		$this->thea = $cdin;
+		$this->doRevoke = $revoke;
 		$this->setSpecificConfig();
 		$client = new Google_Client();
 		$client->setAuthConfig( $this->specSettings['goopath']);
@@ -83,6 +86,12 @@ class GooOAUTHWrapper {
 		else {
 				$this->logdbr($accessToken);
 				$this->client->setAccessToken($accessToken);
+				
+				if ($this->doRevoke) {
+					$this->okRevoke = $this->client->revokeToken();
+					return;
+				}
+				
 				if ($this->client->isAccessTokenExpired()) {
 				try { 
 					$this->log('refresh attempt');
