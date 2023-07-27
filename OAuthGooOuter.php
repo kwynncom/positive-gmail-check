@@ -8,9 +8,11 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
 	public readonly string $emailAddressFromGOW;
 	
-	public function __construct(array $config, string $requireOnceF = '', bool $revoke = false) { 
+	public function __construct(array $config, string $requireOnceF = '', bool $revoke = false, string $uqin = '') { 
 		$uq = '';
-		if ($requireOnceF) $uq = GooOAuthState::set($requireOnceF);
+		if ($requireOnceF) {
+			$uq = GooOAuthState::set($requireOnceF, $uqin); 
+		} unset($uqin);
 		parent::__construct($config, $uq, $revoke);
 		if ($uq) $this->client->setState($uq);
 	}
