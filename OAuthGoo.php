@@ -5,6 +5,8 @@ require_once('log.php');
 
 class GooOAUTHWrapper {
 	
+	const audom = 'accounts.google.com';
+	
 	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
 	const tnms = ['refresh_token', 'access_token'];
 	
@@ -89,7 +91,7 @@ class GooOAUTHWrapper {
 				
 				if ($this->doRevoke) {
 					$this->okRevoke = $this->client->revokeToken();
-					return;
+					return $this->doOAuth();
 				}
 				
 				if ($this->client->isAccessTokenExpired()) {
@@ -148,6 +150,9 @@ class GooOAUTHWrapper {
     protected function doOAuth() {
 		$this->deleteToken();
 		$this->processAuthCode();
+		
+		if (!iscli()) header('Access-Control-Allow-Origin: ' . self::audom);
+		
 		$this->client->setRedirectUri($this->urlbase . $this->thea['redbase']);
 		$auth_url = $this->client->createAuthUrl();
 		$this->oauthurl = $auth_url;

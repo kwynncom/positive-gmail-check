@@ -78,6 +78,10 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     protected function upsertToken($trwo, $email) {
 		
 		$goo = $trwo[self::tfnm];
+		
+		require_once(__DIR__ . '/rdToken.php');
+		
+		rdToken::put($goo);
 
 		$dat20 = [
 			'addr' => $email ? $email : $trwo['_id'],
@@ -117,8 +121,8 @@ class dao_plain extends dao_generic_3 implements qemconfig {
 		$df = $this->pcoll->deleteMany($q30);
 		return;
 	}
-   
-	protected function getPubKeys(bool $isrt, int $cre, string $_id, string | null $emh) : array {
+   //  string | null  // for $emh - removing for now - emergency
+	protected function getPubKeys(bool $isrt, int $cre, string $_id,$emh) : array {
 		if (!$emh) return [];
 		
 		if (!$isrt) return [];
