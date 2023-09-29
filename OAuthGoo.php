@@ -13,6 +13,8 @@ class GooOAUTHWrapper {
 	protected readonly string $urlbase;
 	
 	public readonly bool $okRevoke;
+	
+	private readonly string $thereu;
 
 	// PUBLIC FUNCTIONS BEGIN *******
     public function getOAuthURL() : string { // call after instantiation to see if you need to redirect to Goo for OAUTH
@@ -50,6 +52,11 @@ class GooOAUTHWrapper {
 		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 
 				'error - cannot read secret file - the input-only version', self::err_secret_file_access);
 		$this->specSettings = $set;
+		
+		$ru = $this->urlbase . $this->thea['redbase'];
+		$this->thereu = $ru;
+		self::kwrd($this->thereu);
+
     }
 
 	function __construct(array $cdin, string $reqState = '', bool $revoke = false) {
@@ -60,6 +67,7 @@ class GooOAUTHWrapper {
 		$client->setAuthConfig( $this->specSettings['goopath']);
 		$client->setAccessType('offline');
 		$client->setIncludeGrantedScopes(true);
+		$client->setRedirectUri($this->thereu);
 		$this->client = $client;
 		if ($reqState) $this->client->setState($reqState);
 		
@@ -154,9 +162,9 @@ class GooOAUTHWrapper {
 		
 		if (!iscli()) header('Access-Control-Allow-Origin: ' . self::audom);
 		
-		$ru = $this->urlbase . $this->thea['redbase'];
-		self::kwrd($ru);
-		$this->client->setRedirectUri($ru);
+		// $ru = $this->urlbase . $this->thea['redbase'];
+		// self::kwrd($ru);
+		// $this->client->setRedirectUri($ru);
 		$auth_url = $this->client->createAuthUrl();
 		$this->oauthurl = $auth_url;
     }
