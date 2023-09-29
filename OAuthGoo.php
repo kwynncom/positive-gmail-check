@@ -66,7 +66,8 @@ class GooOAUTHWrapper {
 
 		if ($this->processAuthCode()) return; // if success, continuing results in a loop
 		$this->client->setScopes($this->thea['scope']);
-		$this->setToken();
+		$str = $this->setToken();
+		return;
     }
     
     protected function getGoogleClient() { return $this->client; }

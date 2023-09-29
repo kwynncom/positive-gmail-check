@@ -78,10 +78,6 @@ class dao_plain extends dao_generic_3 implements qemconfig {
     protected function upsertToken($trwo, $email) {
 		
 		$goo = $trwo[self::tfnm];
-		
-		require_once(__DIR__ . '/rdToken.php');
-		
-		rdToken::put($goo);
 
 		$dat20 = [
 			'addr' => $email ? $email : $trwo['_id'],

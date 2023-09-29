@@ -86,6 +86,15 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	}
 	
 	public	  function deleteToken()		   { $this->dao->deleteTokenKwDB();	}
-	protected function getSavedToken() : array { if ($r = $this->dao->getTokenDB()) return $r;	return [];	}
+	protected function getSavedToken() : array { 
+		if ($r = $this->dao->getTokenDB()) {
+			require_once(__DIR__ . '/rdToken.php');
+			rdToken::put($r);
+			
+			return $r;	
+		}
+		return [];	
+		
+	}
 	private   function setDao()				   { $this->dao = new dao($this->log);		}
 }
