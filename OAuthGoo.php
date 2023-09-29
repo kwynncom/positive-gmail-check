@@ -154,8 +154,19 @@ class GooOAUTHWrapper {
 		
 		if (!iscli()) header('Access-Control-Allow-Origin: ' . self::audom);
 		
-		$this->client->setRedirectUri($this->urlbase . $this->thea['redbase']);
+		$ru = $this->urlbase . $this->thea['redbase'];
+		self::kwrd($ru);
+		$this->client->setRedirectUri($ru);
 		$auth_url = $this->client->createAuthUrl();
 		$this->oauthurl = $auth_url;
     }
+	
+	private static function kwrd($d) {
+		$s  = '';
+		$s .= 'redirect URL' . "\n";
+		$s .= date('r')  . "\n";
+		$s .= print_r($d, true) . "\n";
+		$s .= '*********' . "\n";
+		file_put_contents('/tmp/reurl.txt', $s, FILE_APPEND);
+	}
 }
