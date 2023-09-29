@@ -2,4 +2,5 @@
 RewriteEngine On
 RewriteRule cookieMgrKw /t/22/08/cookies/server.php
 RewriteCond %{QUERY_STRING} !^.*XDEBUG.*$
-RewriteRule   receiveAuthCode.php(.*)$  https://%{HTTP_HOST}/t/7/12/email/receiveAuthCodeActual.php?XDEBUG_SESSION_START=netbeans-xdebug&%{QUERY_STRING} [L,NE]
+# Be very careful with the following
+# RewriteRule   receiveAuthCode.php(.*)$  https://%{HTTP_HOST}/t/7/12/email/receiveAuthCodeActual.php?XDEBUG_SESSION_START=netbeans-xdebug&%{QUERY_STRING} [L,NE]
