@@ -4,6 +4,11 @@ require_once('/opt/kwynn/kwutils.php');
 
 class GooOAuthState extends dao_generic_3 {
 	
+	// PHP 8.2
+	private $_id;
+	private $ofile;
+	// END PHP 8.2
+	
 	const dbname = 'goooa';
 	const collname = 'goostates';
 	const goostimeoutS = 1200;

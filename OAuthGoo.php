@@ -5,6 +5,22 @@ require_once('log.php');
 
 class GooOAUTHWrapper {
 	
+	// for 8.2 BEGIN
+	public $oauthurl; // Kwynn public for now PHP 8.2
+	// should probably be readonly?? 2023/12
+	
+	protected $client; // Kwynn 8.2
+	
+	private $specSettings; // Kwynn 8.2
+	
+	private $initTokenSet; // same
+	
+	private $doRevoke;
+	
+	private $thea;
+	
+	// 8.2 end
+	
 	const audom = 'accounts.google.com';
 	
 	const err_secret_file_access = 1848; /* arbitrary, relatively rare code */
