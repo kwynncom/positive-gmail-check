@@ -6,7 +6,7 @@ class enc_cookies {
 	
 	private array $oas;
 	private string $goonm;
-	private readonly string | null $emailHash; // should not be null; not sure
+	private  $emailHash;
 	
     //            1234567890123456 - 16 chars
     const iniv = 'P8ohKFo4nNae0ZBW';
