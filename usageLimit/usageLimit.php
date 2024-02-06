@@ -6,6 +6,11 @@ require_once(__DIR__ . '/usageLimitDao.php');
 
 class usageLimit {
     
+	private readonly array $olima;
+	private readonly object $dao;
+	private array $cnta;
+	private readonly Exception $oex; 
+	
     const fname = 'usage.txt';
     const testMode = false;
 	const useTypes = ['checked', 'oauth', 'revoke'];
@@ -18,7 +23,7 @@ class usageLimit {
 		$lim[] = ['type' => 'oauth'  , 'limits' => [86400 =>  50, 3600 => 15, 60 => 4, 5 => 2]];
 		$lim[] = ['type' => 'revoke' , 'limits' => [86400 =>  50, 3600 => 15, 60 => 3, 5 => 1]];
 
-		$this->lim = $lim;
+		$this->olima = $lim;
 
 		$this->dao = new daoUsage();
     }
@@ -27,13 +32,13 @@ class usageLimit {
     
     private function checkLimit() {
 	
-	foreach ($this->lim    as $arr) 
+	foreach ($this->olima    as $arr) 
 	foreach ($arr['limits'] as $key => $val)
 	{
 	    $cnt[$key] =  $this->dao->getUsage($key, $arr['type']);
 	    if ($cnt[$key] > $val && self::testMode === false) $this->exception($key, $arr['type']);
 	    
-	    if ($arr['type'] === 'checked') $this->cnt = $cnt;
+	    if ($arr['type'] === 'checked') $this->cnta = $cnt;
 	}
 	
 	if (isset($this->oex)) throw $this->oex;
@@ -50,14 +55,14 @@ class usageLimit {
     public function getLimitsTxt() {
 	
 	$str = '';
-	if (	isset($this->cnt))
-		foreach  ($this->cnt as $val) $str .= $val . ' ';
+	if (	isset($this->cnta))
+		foreach  ($this->cnta as $val) $str .= $val . ' ';
 	return $str;
     }
     
     private function exception($key, $type) {
-
-	$this->oex  = new Exception('u52043 - ' . $key . ' type: ' . $type, 261840);
+		if (isset($this->oex)) return;
+		$this->oex  = new Exception('u52043 - ' . $key . ' type: ' . $type, 261840);
 	
     }
     

@@ -13,6 +13,8 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	
 	protected OAuthLog	   $log;
 	private   usageLimit   $ulo;
+	private readonly object $dao;
+	private readonly string $emailHash;
 
 	public function __construct(usageLimit $ulo = null) { 
 		
@@ -28,7 +30,7 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	
 	public function getLog() { return $this->log->get(); }
 	
-	public function getEmailHash() { return $this->emailHash;	}
+	public function getEmailHash() : string { return kwifs($this, 'emailHash', ['kwiff' => '']);	}
 	
 	public function getLimitsO() { return $this->ulo; }
 	

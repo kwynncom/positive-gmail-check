@@ -2,6 +2,8 @@
 
 class OAuthLog {
 	
+	private string $logs;
+	
 	public function __construct() {
 		$this->logs = '';
 	}

@@ -4,9 +4,11 @@ class gmailGetCl {
 	
 	const emailAddressScope = Google_Service_Gmail::GMAIL_METADATA; // GMail send may not work
 	public readonly string $emailAddressFromGmailClient;
+	private readonly object $goomlo;
+	private readonly object $serv;
 	
     private function __construct($googc, $setEmail = false) { // Goo general client
-		$this->goomlo = false;
+		// $this->goomlo = false;
 		$this->serv  = $service = new Google_Service_Gmail($googc);
 		if ($setEmail) $this->emailAddressFromGmailClient = $this->serv->users->getProfile('me')->emailAddress;
 		
@@ -22,7 +24,8 @@ class gmailGetCl {
 		
 	public function getGoomlo() { 
 		$this->checkEmail();
-		return $this->goomlo; 
+		// kwifs is getting much better but still can't return an object
+		return $this->goomlo;
 	}
     
     public static function getCountText($goocli) {
