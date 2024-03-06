@@ -65,8 +65,9 @@ class GooOAUTHWrapper {
 		$this->urlbase = $oarurl = 'https://' .		 $sn .  $this->thea['upath'];
 		$fname = $this->thea['sfb'] . $this->thea['sfx'];
 		$set = [ 'goopath'   => $fname, 'oarurl'    => $oarurl];
-		kwas(is_readable($set['goopath']) && strlen(file_get_contents($set['goopath'])) > 30, 
-				'error - cannot read secret file - the input-only version', self::err_secret_file_access);
+		$secf = kwifsT($set, 'goopath', ['kwiff' => 'no file set in var goopath']);
+		kwas(is_readable($secf) && strlen(file_get_contents($secf)) > 30, 
+				'error - cannot read secret file ' . $secf . ' - the input-only version', self::err_secret_file_access);
 		$this->specSettings = $set;
 		
 		$ru = $this->urlbase . $this->thea['redbase'];
