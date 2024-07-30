@@ -9,6 +9,16 @@ class pemsDoit {
 		$this->do10();
 	}
 	
+	private function isRevReq() { 	    return isrv('revoke') === 'Y'; 	}
+
+	private function condRevOnErr() {
+	    if (!$this->isRevReq()) return;
+	    new positiveEmailCl(null, true);
+	    isucookie::unset(); // doesn't seem to do what I want, but can't hurt
+	    $url = 'https://' . $_SERVER['HTTP_HOST'] . '/' . positiveEmailDefaults::peoaa['upath'];
+	    kwjae(['url' => $url]);
+	}
+
 	function do10() {
 
 		$url = '';
@@ -21,7 +31,7 @@ class pemsDoit {
 			$gco = new positiveEmailCl($ulo);
 			
 			if ($url = $gco->getOAuthURL()) kwas(false, 'oauth - server');
-			if (isrv('revoke') === 'Y') {
+			if ($this->isRevReq()) {
 				$url = $gco->revokeAccess();
 				kwas(false, 'revoking');
 			}
@@ -29,7 +39,10 @@ class pemsDoit {
 
 			$msgtxt = $gco->getEmailCountTxt();
 			if (time() < strtotime('2022-01-27 23:51')) kwas(false, 'test ex');
-		} catch (Exception $exv) { }
+		} catch (Exception $exv) { 
+		    $this->condRevOnErr();
+		    kwnull();
+		}
 		
 		if ($gco) $logs = $gco->getLog();
 

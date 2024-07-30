@@ -16,10 +16,13 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 	private readonly object $dao;
 	private readonly string $emailHash;
 
-	public function __construct(usageLimit $ulo = null) { 
-		
-		$this->ulo = $ulo ? $ulo : new usageLimit();
+	public function __construct(usageLimit $ulo = null, $deleteOnly = false) { 
+
 		$this->log = new OAuthLog();
+
+		if ($deleteOnly) return $this->deleteOnly();
+
+		$this->ulo = $ulo ? $ulo : new usageLimit();
 		$this->setDao();
 		parent::__construct(self::peoaa, self::runnerF);
 		if (isset($this->oauthurl)) return;
@@ -85,6 +88,12 @@ class positiveEmailCl extends GooOAuthWrapperOuter implements positiveEmailDefau
 		$o->deleteToken();
 		dao::expireCookies();
 		return $o->urlbase;
+	}
+
+	private function deleteOnly() {
+	    $this->setDao();
+	    $this->deleteToken();
+	    
 	}
 	
 	public	  function deleteToken()		   { $this->dao->deleteTokenKwDB();	}
