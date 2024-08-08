@@ -19,32 +19,38 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
     }
 
     protected function getSavedToken() : array			 { return [];  } /* you probably want to define a child */
-    protected function receiveRefreshToken(array $token) { 
+    protected function receiveRefreshToken(array $token) { // create a child function to receive the token in the param; don't forget to call this parent from the child before getting email
         $this->setEmailAfterAuth();
     }
 
     protected function setEmailAfterAuth() : string {
-	if (isset($this->emailAddressFromGOW)) return $this->emailAddressFromGOW;
+	if (isset($this->emailAddressOAuthedPr)) return $this->emailAddressOAuthedPr;
 	$tok = $this->client->getAccessToken();
 	$mys = $tok['scope']; unset($tok);
 	if ($emgm = $this->setEmailAddressFromGmail($mys)) return $emgm;
 
 	kwas(strpos($mys, Google_Service_Oauth2::USERINFO_EMAIL) !== false, 'no way to set email address Goo out wrap');
 	$oa = new Google_Service_Oauth2($this->client);
-	$this->emailAddressFromGOW = $this->emailAddressOAuthedPr = $oa->userinfo->get()->email;
-	    return $this->emailAddressFromGOW;
+	return $this->set2EmailOVars($oa->userinfo->get()->email);
     } // func
 
     private function setEmailAddressFromGmail(string $mys) : string {
 	if (strpos($mys, gmailGetCl::emailAddressScope) !== false) {
 		$e = gmailGetCl::getEmailAddress($this->client);
-		$this->emailAddressFromGOW = $e;
+		$this->set2EmailOVars($e);
 		return $e;
 	}
 	return '';
     }
 
-    public function getOAuthedEmail() : string { return kwifs($this, 'emailAddressOAuthedPr', ['kwiff' => '']);    }
+    private function set2EmailOVars($setTo) : string {
+	return $this->emailAddressFromGOW = $this->emailAddressOAuthedPr = $setTo;
+    }
+
+    public function getOAuthedEmail() : string { 
+	if (!isset($this->emailAddressOAuthedPr)) return '';  // kwifs does NOT work because of the private property.  
+	return     $this->emailAddressOAuthedPr;
+    }
 
 } // class
 
