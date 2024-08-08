@@ -6,7 +6,8 @@ require_once('gmailGet.php');
 
 class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 	
-    public readonly string $emailAddressFromGOW;
+    public  readonly string $emailAddressFromGOW;
+    private readonly string $emailAddressOAuthedPr; // see note 2024/08/07 21:08 - at bottom
 
     public function __construct(array $config, string $requireOnceF = '', bool $revoke = false, string $uqin = '') { 
 	$uq = '';
@@ -30,7 +31,7 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 
 	kwas(strpos($mys, Google_Service_Oauth2::USERINFO_EMAIL) !== false, 'no way to set email address Goo out wrap');
 	$oa = new Google_Service_Oauth2($this->client);
-	$this->emailAddressFromGOW = $oa->userinfo->get()->email;
+	$this->emailAddressFromGOW = $this->emailAddressOAuthedPr = $oa->userinfo->get()->email;
 	    return $this->emailAddressFromGOW;
     } // func
 
@@ -41,8 +42,13 @@ class GooOAUTHWrapperOuter extends GooOAUTHWrapper {
 		return $e;
 	}
 	return '';
-
     }
+
+    public function getOAuthedEmail() : string { return kwifs($this, 'emailAddressOAuthedPr', ['kwiff' => '']);    }
+
 } // class
+
+/* While it's nice to be able to publicly access the var, I should set a private var to make sure the approval was from Goo and not just assigned by anyone.
+ * I'll try to consider the public var depprecated and remove it.  It's in use right now, though. *   */
 
 
